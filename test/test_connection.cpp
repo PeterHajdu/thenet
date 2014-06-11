@@ -9,9 +9,10 @@ namespace
   class LowLevelConnection
   {
     public:
-      void send( const char* data, size_t length )
+      size_t send( const char* data, size_t length )
       {
         sent_data.emplace_back( data, data + length );
+        return length;
       }
 
       const the::net::Data last_sent_data()

@@ -13,7 +13,7 @@ namespace net
 class Connection
 {
   public:
-    typedef std::function<void(const char *, size_t)> LowLevelSendCallback;
+    typedef std::function<size_t(const char *, size_t)> LowLevelSendCallback;
     Connection( LowLevelSendCallback );
     Connection( const Connection& ) = delete;
     Connection& operator=( const Connection& ) = delete;
