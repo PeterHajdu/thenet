@@ -1,0 +1,11 @@
+src/libyarrr.a
+test/test_runner
+test/valgrind.log
+
+*swp
+*.cmake
+Makefile
+CMakeFiles
+CMakeCache.txt
+build
+install_manifest.txt
