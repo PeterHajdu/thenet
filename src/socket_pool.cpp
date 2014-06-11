@@ -202,7 +202,7 @@ SocketPool::drop_socket( Socket& socket )
 
 
 void
-SocketPool::start_for( uint32_t run_for_milliseconds )
+SocketPool::run_for( uint32_t run_for_milliseconds )
 {
   if ( poll( &m_poll_descriptors[0], m_poll_descriptors.size(), run_for_milliseconds ) < 0 )
   {

@@ -42,7 +42,7 @@ class SocketPool
 
     //todo: implement address parsing class
     bool connect( const std::string& address, int port );
-    void start_for( uint32_t run_for_milliseconds );
+    void run_for( uint32_t run_for_milliseconds );
 
   private:
     void add_socket_with_callback( Socket::Pointer&& socket );
