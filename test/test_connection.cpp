@@ -62,7 +62,7 @@ Describe(a_connection)
     connection->send( std::move( test_data_copy() ) ), Equals( true );
     connection->send( std::move( test_data_copy() ) ), Equals( true );
     connection->wake_up();
-    AssertThat( low_level_connection->sent_data.size(), Equals( 2 ) );
+    AssertThat( low_level_connection->sent_data.size(), Equals( 2u ) );
   }
 
   It( returns_false_if_there_is_no_message_received )
