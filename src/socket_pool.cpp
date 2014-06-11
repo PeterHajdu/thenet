@@ -154,7 +154,6 @@ SocketPool::SocketPool(
   : m_new_socket_callback( new_socket )
   , m_drop_socket_callback( drop_socket )
   , m_read_data_callback( read_data )
-  , m_should_stop( false )
 {
 }
 
@@ -203,35 +202,24 @@ SocketPool::drop_socket( Socket& socket )
 
 
 void
-SocketPool::stop()
+SocketPool::start_for( uint32_t run_for_milliseconds )
 {
-  m_should_stop = true;
-}
-
-
-void
-SocketPool::start()
-{
-  while ( !m_should_stop )
+  if ( poll( &m_poll_descriptors[0], m_poll_descriptors.size(), run_for_milliseconds ) < 0 )
   {
-    const int no_timeout( 0 );
-    if ( poll( &m_poll_descriptors[0], m_poll_descriptors.size(), no_timeout ) < 0 )
-    {
-      //todo: handle network error
-      return;
-    }
-
-    for ( auto& poll_descriptor : m_poll_descriptors )
-    {
-      const bool no_event( !( poll_descriptor.revents & POLLIN) );
-      if ( no_event )
-      {
-        continue;
-      }
-      m_sockets[ poll_descriptor.fd ]->handle_event();
-    }
-
+    //todo: handle network error
+    return;
   }
+
+  for ( auto& poll_descriptor : m_poll_descriptors )
+  {
+    const bool no_event( !( poll_descriptor.revents & POLLIN) );
+    if ( no_event )
+    {
+      continue;
+    }
+    m_sockets[ poll_descriptor.fd ]->handle_event();
+  }
+
 }
 
 

@@ -42,8 +42,7 @@ class SocketPool
 
     //todo: implement address parsing class
     bool connect( const std::string& address, int port );
-    void start();
-    void stop();
+    void start_for( uint32_t run_for_milliseconds );
 
   private:
     void add_socket_with_callback( Socket::Pointer&& socket );
@@ -56,9 +55,8 @@ class SocketPool
     SocketEventCallback m_new_socket_callback;
     SocketEventCallback m_drop_socket_callback;
     ReadDataCallback m_read_data_callback;
-
-    volatile bool m_should_stop;
 };
+
 }
 }
 
