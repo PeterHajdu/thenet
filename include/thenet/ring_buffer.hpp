@@ -3,7 +3,10 @@
 #include <array>
 #include <atomic>
 
-namespace tsyn
+namespace the
+{
+
+namespace net
 {
 
   /*
@@ -74,6 +77,8 @@ namespace tsyn
       std::atomic<size_t> m_tail;
       std::array< T, size > m_buffer;
   };
+
+}
 
 }
 

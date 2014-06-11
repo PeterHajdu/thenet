@@ -1,13 +1,13 @@
 #pragma once
 
 #include <functional>
-#include <vector>
+
+#include <thenet/types.hpp>
 
 namespace the
 {
 namespace net
 {
-typedef std::vector< char > Data;
 
 class ConnectionBuffer
 {

@@ -1,5 +1,6 @@
 #include <igloo/igloo_alt.h>
 #include <thenet/connection_buffer.hpp>
+#include <thenet/types.hpp>
 
 using namespace igloo;
 

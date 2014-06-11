@@ -4,11 +4,11 @@ using namespace igloo;
 #include <algorithm>
 #include <array>
 #include <thread>
-#include <ring_buffer.hpp>
+#include <thenet/ring_buffer.hpp>
 
 namespace
 {
-  typedef tsyn::RingBuffer< int, 4 > BufferType;
+  typedef the::net::RingBuffer< int, 4 > BufferType;
 
   class ThreadRaii
   {
@@ -34,7 +34,7 @@ Describe( ringbuffer )
 {
   Describe( basic_behavior_with_pod_type )
   {
-    typedef tsyn::RingBuffer< int, 4 > BufferType;
+    typedef the::net::RingBuffer< int, 4 > BufferType;
 
     void asserThatPoppedElementIs( BufferType::value_type expected, BufferType& buffer )
     {
@@ -99,7 +99,7 @@ Describe( ringbuffer )
 
   Describe( basic_behavior_with_moveable_only_type )
   {
-    typedef tsyn::RingBuffer< std::unique_ptr<int>, 4 > BufferType;
+    typedef the::net::RingBuffer< std::unique_ptr<int>, 4 > BufferType;
     It ( can_push_to_and_pop_from_buffer )
     {
       BufferType buffer;
