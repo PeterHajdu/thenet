@@ -1,7 +1,7 @@
 
 set(SOURCE_FILES
   socket_pool.cpp
-  connection.cpp
+  connection_buffer.cpp
     )
 
 add_library(thenet STATIC ${SOURCE_FILES})

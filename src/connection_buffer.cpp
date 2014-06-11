@@ -1,4 +1,4 @@
-#include <thenet/connection.hpp>
+#include <thenet/connection_buffer.hpp>
 
 namespace the
 {
