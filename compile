@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cmake CMakeLists.txt -DCMAKE_INSTALL_PREFIX=~/deploy && LIBRARY_PATH=~/deploy/lib make
+

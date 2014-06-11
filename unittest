@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+git submodule update --init
+UTIL_DIR=~/deploy/bin
+make test && $UTIL_DIR/check_valgrind_log test/valgrind.log
+

@@ -1,4 +1,4 @@
-src/libyarrr.a
+src/libthenet.a
 test/test_runner
 test/valgrind.log
 
