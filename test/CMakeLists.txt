@@ -2,11 +2,13 @@
 # required for igloo:
 add_definitions(-Wno-deprecated-declarations)
 include_directories(igloo)
+include_directories(../src)
 
 set(TEST_SOURCE_FILES
     test_runner.cpp
     test_socket_pool.cpp
     test_connection.cpp
+    test_ringbuffer.cpp
     )
 
 
