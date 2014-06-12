@@ -9,20 +9,33 @@ namespace the
 namespace net
 {
 
+template < typename MessageParser, typename UpperLayer >
 class MessageBuffer
 {
   public:
-    typedef std::function<size_t( const char*, size_t length )> ParseMessageCallback;
-    typedef std::function<void( Data&& message )> MessageCompleteCallback;
+    MessageBuffer( UpperLayer& upper_layer )
+      : m_upper_layer( upper_layer )
+    {
+    }
 
-    MessageBuffer( ParseMessageCallback, MessageCompleteCallback );
-    void receive( const char* buffer, size_t length );
+
+    void receive( const char* buffer, size_t length )
+    {
+      m_buffer.insert( std::end( m_buffer ), buffer, buffer + length );
+      const size_t end_of_message( MessageParser::parse( &m_buffer[0], m_buffer.size() ) );
+
+      Data::const_iterator message_start( std::begin( m_buffer ) );
+      Data::const_iterator message_end( std::begin( m_buffer ) + end_of_message );
+
+      m_upper_layer.message_from_network( Data( message_start, message_end ) );
+      m_buffer.erase( message_start, message_end );
+    }
+
 
   private:
-    const ParseMessageCallback m_parse_message;
-    const MessageCompleteCallback m_message_comlete;
     //todo: consider other container, messages are going to be erased from the beginning of the buffer
     Data m_buffer;
+    UpperLayer& m_upper_layer;
 };
 
 }
