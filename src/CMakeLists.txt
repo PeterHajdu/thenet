@@ -3,6 +3,7 @@ set(SOURCE_FILES
   socket_pool.cpp
   message_queue.cpp
   socket.cpp
+  connection_pool.cpp
     )
 
 add_library(thenet STATIC ${SOURCE_FILES})
