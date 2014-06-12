@@ -8,7 +8,7 @@ set(TEST_SOURCE_FILES
     test_runner.cpp
     test_socket_pool.cpp
     test_socket.cpp
-    test_connection_buffer.cpp
+    test_message_buffer.cpp
     test_ringbuffer.cpp
     test_message_queue.cpp
     )

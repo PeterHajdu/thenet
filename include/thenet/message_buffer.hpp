@@ -9,13 +9,13 @@ namespace the
 namespace net
 {
 
-class ConnectionBuffer
+class MessageBuffer
 {
   public:
     typedef std::function<size_t( const char*, size_t length )> ParseMessageCallback;
     typedef std::function<void( Data&& message )> MessageCompleteCallback;
 
-    ConnectionBuffer( ParseMessageCallback, MessageCompleteCallback );
+    MessageBuffer( ParseMessageCallback, MessageCompleteCallback );
     void receive( const char* buffer, size_t length );
 
   private:

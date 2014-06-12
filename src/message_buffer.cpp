@@ -1,11 +1,11 @@
-#include <thenet/connection_buffer.hpp>
+#include <thenet/message_buffer.hpp>
 
 namespace the
 {
 namespace net
 {
 
-  ConnectionBuffer::ConnectionBuffer(
+  MessageBuffer::MessageBuffer(
       ParseMessageCallback parse_message_callback,
       MessageCompleteCallback message_complete_callback )
     : m_parse_message( parse_message_callback )
@@ -14,7 +14,7 @@ namespace net
   }
 
   void
-  ConnectionBuffer::receive( const char* buffer, size_t length )
+  MessageBuffer::receive( const char* buffer, size_t length )
   {
     m_buffer.insert( std::end( m_buffer ), buffer, buffer + length );
     const size_t end_of_message( m_parse_message( &m_buffer[0], m_buffer.size() ) );

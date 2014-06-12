@@ -1,7 +1,7 @@
 
 set(SOURCE_FILES
   socket_pool.cpp
-  connection_buffer.cpp
+  message_buffer.cpp
   message_queue.cpp
   socket.cpp
     )

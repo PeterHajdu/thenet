@@ -1,5 +1,5 @@
 #include <igloo/igloo_alt.h>
-#include <thenet/connection_buffer.hpp>
+#include <thenet/message_buffer.hpp>
 #include <thenet/types.hpp>
 
 using namespace igloo;
@@ -39,7 +39,7 @@ Describe(a_connection_buffer)
   {
     message_parser.reset( new MessageParser );
     message_checker.reset( new MessageChecker );
-    buffer.reset( new the::net::ConnectionBuffer(
+    buffer.reset( new the::net::MessageBuffer(
           std::bind(
             &MessageParser::parse,
             message_parser.get(),
@@ -86,7 +86,7 @@ Describe(a_connection_buffer)
     AssertThat( message_checker->passed_message, Equals( test_message ) );
   }
 
-  std::unique_ptr< the::net::ConnectionBuffer > buffer;
+  std::unique_ptr< the::net::MessageBuffer > buffer;
   std::unique_ptr< MessageParser > message_parser;
   std::unique_ptr< MessageChecker > message_checker;
   const std::string test_message{ "dog" };
