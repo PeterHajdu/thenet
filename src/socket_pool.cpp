@@ -49,13 +49,9 @@ namespace
   class ReadingSocket : public the::net::Socket
   {
     public:
-      ReadingSocket(
-          int socket,
-          the::net::SocketPool::ReadDataCallback read_data_callback,
-          the::net::SocketPool::SocketEventCallback drop_socket_callback )
+      ReadingSocket( int socket, the::net::SocketPool& socket_pool )
         : Socket( socket )
-        , m_read_data_callback( read_data_callback )
-        , m_drop_socket_callback( drop_socket_callback )
+        , m_socket_pool( socket_pool )
       {
       }
 
@@ -67,33 +63,24 @@ namespace
         const bool connection_lost( !length );
         if ( connection_lost )
         {
-          m_drop_socket_callback( *this );
+          m_socket_pool.on_socket_lost( *this );
           return;
         }
 
-        m_read_data_callback( *this, &buffer[ 0 ], length );
+        m_socket_pool.on_data_ready( *this, &buffer[ 0 ], length );
       }
 
     private:
-
-      the::net::SocketPool::ReadDataCallback m_read_data_callback;
-      the::net::SocketPool::SocketEventCallback m_drop_socket_callback;
+      the::net::SocketPool& m_socket_pool;
   };
 
 
   class ListeningSocket : public the::net::Socket
   {
     public:
-      typedef std::function<void(the::net::Socket::Pointer&&)> AddSocketCallback;
-      ListeningSocket(
-          int port,
-          AddSocketCallback add_socket_callback,
-          the::net::SocketPool::ReadDataCallback read_data_callback,
-          the::net::SocketPool::SocketEventCallback drop_socket_callback )
+      ListeningSocket( int port, the::net::SocketPool& socket_pool )
         : Socket( socket( AF_INET, SOCK_STREAM, 0 ) )
-        , m_add_socket_callback( add_socket_callback )
-        , m_read_data_callback( read_data_callback )
-        , m_drop_socket_callback( drop_socket_callback )
+        , m_socket_pool( socket_pool )
       {
         allow_address_reuse( fd );
         bind_to_port( port, fd );
@@ -107,17 +94,14 @@ namespace
 
         Socket::Pointer new_socket( new ReadingSocket(
               accept(fd, (struct sockaddr *) &address, &sin_size),
-              m_read_data_callback,
-              m_drop_socket_callback ) );
+              m_socket_pool ) );
 
-        m_add_socket_callback( std::move( new_socket ) );
+        m_socket_pool.on_new_socket( std::move( new_socket ) );
       }
 
 
     private:
-      AddSocketCallback m_add_socket_callback;
-      the::net::SocketPool::ReadDataCallback m_read_data_callback;
-      the::net::SocketPool::SocketEventCallback m_drop_socket_callback;
+      the::net::SocketPool& m_socket_pool;
   };
 
 }
@@ -142,17 +126,17 @@ SocketPool::SocketPool(
 void
 SocketPool::listen( int port )
 {
-  add_socket( Socket::Pointer(
-        new ListeningSocket(
-          port,
-          std::bind( &SocketPool::add_socket_with_callback, this, std::placeholders::_1 ),
-          m_read_data_callback,
-          std::bind( &SocketPool::drop_socket, this, std::placeholders::_1 ) ) ) );
+  add_socket( Socket::Pointer( new ListeningSocket( port, *this ) ) );
 }
 
+void
+SocketPool::on_data_ready( Socket& socket, const char* data, size_t length )
+{
+  m_read_data_callback( socket, data, length );
+}
 
 void
-SocketPool::add_socket_with_callback( Socket::Pointer&& socket )
+SocketPool::on_new_socket( Socket::Pointer&& socket )
 {
   m_new_socket_callback( *socket );
   add_socket( std::move( socket ) );
@@ -168,7 +152,7 @@ SocketPool::add_socket( Socket::Pointer&& socket )
 
 
 void
-SocketPool::drop_socket( Socket& socket )
+SocketPool::on_socket_lost( Socket& socket )
 {
   m_drop_socket_callback( socket );
 
@@ -213,17 +197,17 @@ bool SocketPool::connect( const std::string& address, int port )
 
   memcpy( serverHost->h_addr, &(serverData.sin_addr.s_addr), serverHost->h_length);
 
-  Socket::Pointer new_socket( new ReadingSocket(
+  Socket::Pointer new_socket(
+      new ReadingSocket(
         socket( PF_INET, SOCK_STREAM, IPPROTO_TCP ),
-        m_read_data_callback,
-        std::bind( &SocketPool::drop_socket, this, std::placeholders::_1 ) ) );
+        *this ) );
 
   if ( ::connect( new_socket->fd, (struct sockaddr *)&serverData, sizeof( serverData ) ) < 0 )
   {
     return false;
   }
 
-  add_socket_with_callback( std::move( new_socket ) );
+  on_new_socket( std::move( new_socket ) );
   return true;
 }
 
