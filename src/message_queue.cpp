@@ -1,4 +1,4 @@
-#include <thenet/connection.hpp>
+#include <thenet/message_queue.hpp>
 
 namespace the
 {
@@ -6,25 +6,25 @@ namespace the
 namespace net
 {
 
-Connection::Connection( LowLevelSendCallback low_level_send_callback )
+MessageQueue::MessageQueue( LowLevelSendCallback low_level_send_callback )
   : m_low_level_send( low_level_send_callback )
 {
 }
 
 bool
-Connection::send( Data&& data )
+MessageQueue::send( Data&& data )
 {
   return m_out_buffer.push( data );
 }
 
 bool
-Connection::receive( Data& data )
+MessageQueue::receive( Data& data )
 {
   return m_in_buffer.pop( data );
 }
 
 void
-Connection::wake_up()
+MessageQueue::wake_up()
 {
   Data data;
   while ( m_out_buffer.pop( data ) )
@@ -34,7 +34,7 @@ Connection::wake_up()
 }
 
 void
-Connection::data_from_network( Data&& data )
+MessageQueue::message_from_network( Data&& data )
 {
   m_in_buffer.push( data );
 }
