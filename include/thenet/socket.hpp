@@ -21,6 +21,8 @@ class Socket
     size_t send( const char* message, size_t length );
 
     const int fd;
+    const int id;
+
     virtual void handle_event() = 0;
 };
 }
