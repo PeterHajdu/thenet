@@ -12,6 +12,7 @@ set(TEST_SOURCE_FILES
     test_ringbuffer.cpp
     test_message_queue.cpp
     test_connection_pool.cpp
+    test_connection.cpp
     )
 
 

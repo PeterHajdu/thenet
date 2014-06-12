@@ -17,7 +17,7 @@ ConnectionPool::ConnectionPool(
 void
 ConnectionPool::on_new_socket( Socket& socket )
 {
-  Connection::Pointer new_connection( new Connection() );
+  Connection::Pointer new_connection( new Connection( socket ) );
   m_new_connection( *new_connection );
   m_connections.emplace( std::make_pair(
         socket.id,
