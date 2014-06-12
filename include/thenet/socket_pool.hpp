@@ -9,34 +9,19 @@
 #include <algorithm>
 #include <memory>
 
+#include <thenet/socket.hpp>
 
 namespace the
 {
 namespace net
 {
-class Socket
-{
-  public:
-    typedef std::unique_ptr< Socket > Pointer;
-    Socket( int fd );
-    Socket( const Socket& ) = delete;
-    Socket& operator=( const Socket& ) = delete;
-
-    virtual ~Socket();
-
-    size_t send( const char* message, size_t length );
-
-    const int fd;
-    virtual void handle_event() = 0;
-
-
-};
 
 class SocketPool
 {
   public:
     typedef std::function<void(Socket&)> SocketEventCallback;
     typedef std::function<void(Socket&,const char*,size_t)> ReadDataCallback;
+
     SocketPool( SocketEventCallback new_socket, SocketEventCallback drop_socket, ReadDataCallback read_data );
     void listen( int port );
 
