@@ -4,6 +4,7 @@
 #include <thenet/types.hpp>
 #include <netinet/in.h>
 #include "test_socket.hpp"
+#include "test_message.hpp"
 
 using namespace igloo;
 
@@ -27,18 +28,10 @@ Describe(an_incoming_packetizer)
 {
   void set_up_test_message( const std::string& message )
   {
-    //todo: use test::Message as much as possible
-    packetized_test_message = message;
-    const uint32_t network_length_of_test_message(
-        htonl( packetized_test_message.length() ) );
-    network_test_message = std::string(
-        reinterpret_cast<const char*>( &network_length_of_test_message ),
-        sizeof( network_length_of_test_message ) );
-    network_test_message += message;
-
+    test_message.reset( new test::Message( message ) );
     const size_t split_at( 5 );
-    network_first_part = network_test_message.substr( 0, split_at );
-    network_second_part = network_test_message.substr( split_at );
+    network_first_part = test_message->network.substr( 0, split_at );
+    network_second_part = test_message->network.substr( split_at );
   }
 
   void SetUp()
@@ -51,7 +44,7 @@ Describe(an_incoming_packetizer)
 
   It( is_able_to_receive_data )
   {
-    incoming_packetizer->receive( network_test_message.c_str(), network_test_message.length() );
+    incoming_packetizer->receive( test_message->network.c_str(), test_message->network.length() );
   }
 
   void receive_data( const std::string& data )
@@ -61,15 +54,15 @@ Describe(an_incoming_packetizer)
 
   It( should_call_message_ready_callback_with_the_complete_message )
   {
-    receive_data( network_test_message );
-    AssertThat( upper_layer->passed_message, Equals( packetized_test_message ) );
+    receive_data( test_message->network );
+    AssertThat( upper_layer->passed_message, Equals( test_message->plain ) );
   }
 
   It( should_accumulate_read_data_if_a_message_is_not_complete )
   {
     receive_data( network_first_part );
     receive_data( network_second_part );
-    AssertThat( upper_layer->passed_message, Equals( packetized_test_message ) );
+    AssertThat( upper_layer->passed_message, Equals( test_message->plain ) );
   }
 
   It( should_call_message_ready_callback_only_if_the_message_is_complete )
@@ -80,17 +73,16 @@ Describe(an_incoming_packetizer)
 
   It( should_remove_complete_message_from_the_buffer )
   {
-    receive_data( network_test_message );
+    receive_data( test_message->network );
     set_up_test_message( "another test message" );
-    receive_data( network_test_message );
-    AssertThat( upper_layer->passed_message, Equals( packetized_test_message ) );
+    receive_data( test_message->network );
+    AssertThat( upper_layer->passed_message, Equals( test_message->plain ) );
   }
 
   std::unique_ptr< the::net::packetizer::Incoming<UpperLayer> > incoming_packetizer;
   std::unique_ptr< UpperLayer > upper_layer;
 
-  std::string packetized_test_message;
-  std::string network_test_message;
+  std::unique_ptr< test::Message > test_message;
 
   std::string network_first_part;
   std::string network_second_part;
@@ -107,7 +99,7 @@ Describe(an_outgoing_packetizer)
 
   the::net::Data copy_of_test_message()
   {
-    return { std::begin( test_message ), std::end( test_message ) };
+    return test_message.plain_data;
   }
 
   It( sends_messages_over_the_socket )
@@ -125,11 +117,11 @@ Describe(an_outgoing_packetizer)
     const the::net::Data sent_message( socket->sent_message() );
 
     incoming_packetizer.receive( &sent_message[0], sent_message.size() );
-    AssertThat( upper_layer.passed_message, Equals( test_message ) );
+    AssertThat( upper_layer.passed_message, Equals( test_message.plain ) );
   }
 
   test::Socket::Pointer socket;
-  std::string test_message{ "test" };
+  test::Message test_message{ "test" };
   std::unique_ptr< the::net::packetizer::Outgoing > outgoing_packetizer;
 };
 
