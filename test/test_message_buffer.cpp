@@ -38,9 +38,11 @@ namespace
       void message_from_network( the::net::Data&& data )
       {
         passed_message = std::string( begin( data ), end( data ) );
+        was_not_called = false;
       }
 
       std::string passed_message;
+      bool was_not_called{ true };
   };
 }
 
@@ -86,6 +88,13 @@ Describe(a_message_buffer)
     MessageParser::end_of_message = test_message.length();
     buffer->receive( test_message.c_str(), test_message.length() );
     AssertThat( upper_layer->passed_message, Equals( test_message ) );
+  }
+
+  It( should_call_message_ready_callback_only_if_the_message_is_complete )
+  {
+    MessageParser::end_of_message = 0;
+    buffer->receive( test_message.c_str(), test_message.length() );
+    AssertThat( upper_layer->was_not_called, Equals( true ) );
   }
 
   std::unique_ptr< the::net::MessageBuffer<MessageParser,UpperLayer> > buffer;

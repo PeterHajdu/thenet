@@ -24,6 +24,11 @@ class MessageBuffer
       m_buffer.insert( std::end( m_buffer ), buffer, buffer + length );
       const size_t end_of_message( MessageParser::parse( &m_buffer[0], m_buffer.size() ) );
 
+      if ( 0 == end_of_message )
+      {
+        return;
+      }
+
       Data::const_iterator message_start( std::begin( m_buffer ) );
       Data::const_iterator message_end( std::begin( m_buffer ) + end_of_message );
 
