@@ -2,7 +2,6 @@
 #include <thenet/socket.hpp>
 #include <thenet/types.hpp>
 
-
 namespace the
 {
 namespace net

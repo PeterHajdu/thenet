@@ -30,7 +30,7 @@ class SocketPool
     void run_for( uint32_t run_for_milliseconds );
 
     void on_socket_lost( Socket& socket );
-    void on_data_ready( Socket&, const char*, size_t );
+    void on_data_available( Socket&, const char*, size_t );
     void on_new_socket( Socket::Pointer&& socket );
   private:
     void add_socket( Socket::Pointer&& socket );

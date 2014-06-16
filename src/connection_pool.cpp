@@ -37,6 +37,18 @@ ConnectionPool::on_socket_lost( Socket& socket )
   m_connections.erase( connection );
 }
 
+void
+ConnectionPool::on_data_available( Socket& socket, const char* message, size_t length )
+{
+  ConnectionContainer::iterator connection( m_connections.find( socket.id ) );
+  if ( connection==m_connections.end() )
+  {
+    return;
+  }
+
+  connection->second->data_from_network( message, length );
+}
+
 }
 }
 

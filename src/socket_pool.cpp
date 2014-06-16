@@ -67,7 +67,7 @@ namespace
           return;
         }
 
-        m_socket_pool.on_data_ready( *this, &buffer[ 0 ], length );
+        m_socket_pool.on_data_available( *this, &buffer[ 0 ], length );
       }
 
     private:
@@ -130,7 +130,7 @@ SocketPool::listen( int port )
 }
 
 void
-SocketPool::on_data_ready( Socket& socket, const char* data, size_t length )
+SocketPool::on_data_available( Socket& socket, const char* data, size_t length )
 {
   m_read_data_callback( socket, data, length );
 }

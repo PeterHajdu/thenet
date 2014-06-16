@@ -27,6 +27,7 @@ Describe(an_incoming_packetizer)
 {
   void set_up_test_message( const std::string& message )
   {
+    //todo: use test::Message as much as possible
     packetized_test_message = message;
     const uint32_t network_length_of_test_message(
         htonl( packetized_test_message.length() ) );

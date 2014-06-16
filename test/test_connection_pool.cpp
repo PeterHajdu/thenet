@@ -5,6 +5,7 @@ using namespace igloo;
 #include <thenet/socket.hpp>
 
 #include "test_socket.hpp"
+#include "test_message.hpp"
 
 namespace
 {
@@ -94,8 +95,33 @@ Describe( a_connection_pool )
     AssertThat( checker->lost_connections, HasLength( 1 ) );
   }
 
+  bool has_test_message( the::net::Connection& connection )
+  {
+    the::net::Data message;
+    return
+      connection.receive( message ) &&
+      message == test_message.plain_data;
+  }
+
+  It( forwards_data_to_connections )
+  {
+    connection_pool->on_data_available( *sockets[0], test_message.network.data(), test_message.network.size() );
+    AssertThat( has_test_message( *checker->new_connections[ 0 ] ), Equals( true ) );
+  }
+
+  It( forwards_data_to_the_correct_connection )
+  {
+    add_new_sockets( 2 );
+    the::net::Socket& second_socket( *sockets[1] );
+    the::net::Connection* second_connection( checker->new_connections[ 1 ] );
+
+    connection_pool->on_data_available( second_socket, test_message.network.data(), test_message.network.size() );
+    AssertThat( has_test_message( *second_connection ), Equals( true ) );
+  }
+
   std::unique_ptr< ConnectionPoolChecker > checker;
   std::unique_ptr< the::net::ConnectionPool > connection_pool;
   std::vector< test::Socket::Pointer > sockets;
+  const test::Message test_message{ "test" };
 };
 
