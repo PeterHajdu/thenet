@@ -10,10 +10,10 @@ namespace net
 {
 
 template < typename MessageParser, typename UpperLayer >
-class MessageBuffer
+class Packetizer
 {
   public:
-    MessageBuffer( UpperLayer& upper_layer )
+    Packetizer( UpperLayer& upper_layer )
       : m_upper_layer( upper_layer )
     {
     }

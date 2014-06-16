@@ -1,5 +1,5 @@
 #include <igloo/igloo_alt.h>
-#include <thenet/message_buffer.hpp>
+#include <thenet/packetizer.hpp>
 #include <thenet/types.hpp>
 
 using namespace igloo;
@@ -46,13 +46,13 @@ namespace
   };
 }
 
-Describe(a_message_buffer)
+Describe(a_packetizer)
 {
   void SetUp()
   {
     MessageParser::reset();
     upper_layer.reset( new UpperLayer );
-    buffer.reset( new the::net::MessageBuffer<MessageParser,UpperLayer>( *upper_layer ) );
+    buffer.reset( new the::net::Packetizer<MessageParser,UpperLayer>( *upper_layer ) );
   }
 
   It( is_able_to_receive_data )
@@ -97,7 +97,7 @@ Describe(a_message_buffer)
     AssertThat( upper_layer->was_not_called, Equals( true ) );
   }
 
-  std::unique_ptr< the::net::MessageBuffer<MessageParser,UpperLayer> > buffer;
+  std::unique_ptr< the::net::Packetizer<MessageParser,UpperLayer> > buffer;
   std::unique_ptr< UpperLayer > upper_layer;
   const std::string test_message{ "dog" };
 };
