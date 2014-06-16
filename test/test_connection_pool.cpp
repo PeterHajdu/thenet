@@ -54,7 +54,7 @@ Describe( a_connection_pool )
   {
     for ( size_t i( 0 ); i < count; ++i )
     {
-      sockets.emplace_back( new test::Socket( 0 ) );
+      sockets.push_back( test::Socket::create() );
       connection_pool->on_new_socket( *sockets.back() );
     }
   }
@@ -96,6 +96,6 @@ Describe( a_connection_pool )
 
   std::unique_ptr< ConnectionPoolChecker > checker;
   std::unique_ptr< the::net::ConnectionPool > connection_pool;
-  std::vector< the::net::Socket::Pointer > sockets;
+  std::vector< test::Socket::Pointer > sockets;
 };
 

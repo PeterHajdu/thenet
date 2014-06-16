@@ -9,11 +9,10 @@ Describe( a_socket )
 
   It( has_a_unique_id )
   {
-    test::Socket first_socket{ dummy_file_descriptor };
-    test::Socket second_socket{ dummy_file_descriptor };
-    AssertThat( first_socket.id, !Equals( second_socket.id ) );
+    test::Socket::Pointer first_socket{ test::Socket::create() };
+    test::Socket::Pointer second_socket{ test::Socket::create() };
+    AssertThat( first_socket->id, !Equals( second_socket->id ) );
   }
 
-  const int dummy_file_descriptor{ 0 };
 };
 
