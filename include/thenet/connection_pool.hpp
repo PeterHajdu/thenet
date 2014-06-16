@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include <thenet/connection.hpp>
+#include <mutex>
 
 namespace the
 {
@@ -32,11 +33,13 @@ class ConnectionPool
 
     typedef std::unordered_map< int, Connection::Pointer > ConnectionContainer;
     ConnectionContainer m_connections;
+    std::mutex m_connections_mutex;
 };
 
 template <typename functor>
 void ConnectionPool::enumerate( functor enumerator )
 {
+  std::lock_guard<std::mutex> guard( m_connections_mutex );
   for ( auto& connection : m_connections )
   {
     enumerator( *(connection.second) );
