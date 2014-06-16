@@ -1,7 +1,9 @@
+
 #include <igloo/igloo_alt.h>
 #include <packetizer.hpp>
 #include <thenet/types.hpp>
 #include <netinet/in.h>
+#include "test_socket.hpp"
 
 using namespace igloo;
 
@@ -92,4 +94,42 @@ Describe(an_incoming_packetizer)
   std::string network_first_part;
   std::string network_second_part;
 };
+
+Describe(an_outgoing_packetizer)
+{
+  void SetUp()
+  {
+    socket = test::Socket::create();
+    outgoing_packetizer.reset(
+        new the::net::packetizer::Outgoing( *socket ) );
+  }
+
+  the::net::Data copy_of_test_message()
+  {
+    return { std::begin( test_message ), std::end( test_message ) };
+  }
+
+  It( sends_messages_over_the_socket )
+  {
+    outgoing_packetizer->send( copy_of_test_message() );
+    AssertThat( socket->has_no_messages(), Equals( false ) );
+  }
+
+  It( sends_messages_that_incoming_packetizer_can_parse )
+  {
+    UpperLayer upper_layer;
+    the::net::packetizer::Incoming<UpperLayer> incoming_packetizer( upper_layer );
+
+    outgoing_packetizer->send( copy_of_test_message() );
+    const the::net::Data sent_message( socket->sent_message() );
+
+    incoming_packetizer.receive( &sent_message[0], sent_message.size() );
+    AssertThat( upper_layer.passed_message, Equals( test_message ) );
+  }
+
+  test::Socket::Pointer socket;
+  std::string test_message{ "test" };
+  std::unique_ptr< the::net::packetizer::Outgoing > outgoing_packetizer;
+};
+
 

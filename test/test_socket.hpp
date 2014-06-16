@@ -28,12 +28,6 @@ class Socket : public the::net::Socket
       return Pointer( new Socket( fds[ 1 ], fds[ 0 ] ) );
     }
 
-    Socket( int fd, int test_file_descriptor )
-      : the::net::Socket( fd )
-      , test_file_descriptor( test_file_descriptor )
-    {
-    }
-
     ~Socket()
     {
       close( test_file_descriptor );
@@ -60,6 +54,13 @@ class Socket : public the::net::Socket
     }
 
     virtual void handle_event() override
+    {
+    }
+
+  private:
+    Socket( int fd, int test_file_descriptor )
+      : the::net::Socket( fd )
+      , test_file_descriptor( test_file_descriptor )
     {
     }
 

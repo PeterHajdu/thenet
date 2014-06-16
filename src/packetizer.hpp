@@ -8,6 +8,8 @@ namespace the
 {
 namespace net
 {
+class Socket;
+
 namespace packetizer
 {
 
@@ -64,6 +66,16 @@ class Incoming
     UpperLayer& m_upper_layer;
     static const size_t incomplete_message{ 0 };
     static const size_t header_length{ sizeof( uint32_t ) };
+};
+
+class Outgoing
+{
+  public:
+    Outgoing( Socket& socket );
+    void send( Data&& data );
+
+  private:
+    Socket& m_socket;
 };
 
 }

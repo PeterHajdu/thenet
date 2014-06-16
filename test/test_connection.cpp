@@ -10,7 +10,7 @@ Describe( a_connection )
 
   void SetUp()
   {
-    socket = std::move( test::Socket::create() );
+    socket = test::Socket::create();
     connection.reset( new the::net::Connection( *socket ) );
   }
 

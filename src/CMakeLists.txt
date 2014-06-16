@@ -5,6 +5,7 @@ set(SOURCE_FILES
   socket.cpp
   connection_pool.cpp
   connection.cpp
+  packetizer.cpp
     )
 
 add_library(thenet STATIC ${SOURCE_FILES})
