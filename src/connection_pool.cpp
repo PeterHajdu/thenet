@@ -55,6 +55,15 @@ ConnectionPool::on_data_available( Socket& socket, const char* message, size_t l
   connection->second->data_from_network( message, length );
 }
 
+void
+ConnectionPool::wake_up_on_network_thread() const
+{
+  for ( const auto& connection : m_connections )
+  {
+    connection.second->wake_up_on_network_thread();
+  }
+}
+
 }
 }
 

@@ -136,6 +136,16 @@ Describe( a_connection_pool )
     }
   }
 
+  It( wakes_up_all_connections )
+  {
+    test::Socket& socket( *sockets[0] );
+    the::net::Connection& connection( *checker->new_connections[ 0 ] );
+    connection.send( the::net::Data( test_message.plain_data ) );
+
+    connection_pool->wake_up_on_network_thread();
+    AssertThat( socket.sent_message(), Equals( test_message.network_data ) );
+  }
+
   std::unique_ptr< ConnectionPoolChecker > checker;
   std::unique_ptr< the::net::ConnectionPool > connection_pool;
   std::vector< test::Socket::Pointer > sockets;

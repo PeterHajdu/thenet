@@ -24,8 +24,10 @@ class ConnectionPool
     void on_socket_lost( Socket& lost_socket );
     void on_data_available( Socket& lost_socket, const char* data, size_t length );
 
+    void wake_up_on_network_thread() const;
+
     template <typename functor>
-    void enumerate( functor );
+    void enumerate( functor ) const;
 
   private:
     ConnectionEventCallback m_new_connection;
@@ -33,11 +35,11 @@ class ConnectionPool
 
     typedef std::unordered_map< int, Connection::Pointer > ConnectionContainer;
     ConnectionContainer m_connections;
-    std::mutex m_connections_mutex;
+    mutable std::mutex m_connections_mutex;
 };
 
 template <typename functor>
-void ConnectionPool::enumerate( functor enumerator )
+void ConnectionPool::enumerate( functor enumerator ) const
 {
   std::lock_guard<std::mutex> guard( m_connections_mutex );
   for ( auto& connection : m_connections )
