@@ -1,37 +1,12 @@
 #include <igloo/igloo_alt.h>
 #include <packetizer.hpp>
 #include <thenet/types.hpp>
+#include <netinet/in.h>
 
 using namespace igloo;
 
 namespace
 {
-  class MessageParser
-  {
-    public:
-      static size_t parse( const char* message, size_t length )
-      {
-        parse_had_been_called = true;
-        message_to_check = std::string( message, length );
-        return end_of_message;
-      }
-
-      static void reset()
-      {
-        parse_had_been_called = false;
-        message_to_check.clear();
-        end_of_message = 0;
-      }
-
-      static bool parse_had_been_called;
-      static std::string message_to_check;
-      static size_t end_of_message;
-  };
-
-  bool MessageParser::parse_had_been_called( false );
-  std::string MessageParser::message_to_check( "" );
-  size_t MessageParser::end_of_message( 0 );
-
   class UpperLayer
   {
     public:
@@ -48,57 +23,73 @@ namespace
 
 Describe(an_incoming_packetizer)
 {
+  void set_up_test_message( const std::string& message )
+  {
+    packetized_test_message = message;
+    const uint32_t network_length_of_test_message(
+        htonl( packetized_test_message.length() ) );
+    network_test_message = std::string(
+        reinterpret_cast<const char*>( &network_length_of_test_message ),
+        sizeof( network_length_of_test_message ) );
+    network_test_message += message;
+
+    const size_t split_at( 5 );
+    network_first_part = network_test_message.substr( 0, split_at );
+    network_second_part = network_test_message.substr( split_at );
+  }
+
   void SetUp()
   {
-    MessageParser::reset();
     upper_layer.reset( new UpperLayer );
-    incoming_packetizer.reset( new the::net::packetizer::Incoming<MessageParser,UpperLayer>( *upper_layer ) );
+    incoming_packetizer.reset( new the::net::packetizer::Incoming<UpperLayer>( *upper_layer ) );
+    set_up_test_message( "dog" );
   }
+
 
   It( is_able_to_receive_data )
   {
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( network_test_message.c_str(), network_test_message.length() );
   }
 
-  It( should_ask_message_parser_if_a_message_is_complete )
+  void receive_data( const std::string& data )
   {
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
-    AssertThat( MessageParser::parse_had_been_called, Equals( true ) );
-  }
-
-  It( should_accumulate_read_data_if_a_message_is_not_complete )
-  {
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
-    AssertThat( MessageParser::message_to_check, Equals( test_message ) );
-
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
-    AssertThat( MessageParser::message_to_check, Equals( test_message + test_message ) );
-  }
-
-  It( should_remove_complete_message_from_the_buffer )
-  {
-    MessageParser::end_of_message = test_message.length();
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
-    AssertThat( MessageParser::message_to_check, Equals( test_message ) );
+    incoming_packetizer->receive( data.c_str(), data.length() );
   }
 
   It( should_call_message_ready_callback_with_the_complete_message )
   {
-    MessageParser::end_of_message = test_message.length();
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
-    AssertThat( upper_layer->passed_message, Equals( test_message ) );
+    receive_data( network_test_message );
+    AssertThat( upper_layer->passed_message, Equals( packetized_test_message ) );
+  }
+
+  It( should_accumulate_read_data_if_a_message_is_not_complete )
+  {
+    receive_data( network_first_part );
+    receive_data( network_second_part );
+    AssertThat( upper_layer->passed_message, Equals( packetized_test_message ) );
   }
 
   It( should_call_message_ready_callback_only_if_the_message_is_complete )
   {
-    MessageParser::end_of_message = 0;
-    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
+    receive_data( network_first_part );
     AssertThat( upper_layer->was_not_called, Equals( true ) );
   }
 
-  std::unique_ptr< the::net::packetizer::Incoming<MessageParser,UpperLayer> > incoming_packetizer;
+  It( should_remove_complete_message_from_the_buffer )
+  {
+    receive_data( network_test_message );
+    set_up_test_message( "another test message" );
+    receive_data( network_test_message );
+    AssertThat( upper_layer->passed_message, Equals( packetized_test_message ) );
+  }
+
+  std::unique_ptr< the::net::packetizer::Incoming<UpperLayer> > incoming_packetizer;
   std::unique_ptr< UpperLayer > upper_layer;
-  const std::string test_message{ "dog" };
+
+  std::string packetized_test_message;
+  std::string network_test_message;
+
+  std::string network_first_part;
+  std::string network_second_part;
 };
 
