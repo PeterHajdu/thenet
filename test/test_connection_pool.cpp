@@ -119,6 +119,23 @@ Describe( a_connection_pool )
     AssertThat( has_test_message( *second_connection ), Equals( true ) );
   }
 
+  It( allows_enumeration_on_the_connection_list )
+  {
+    add_new_sockets( 2 );
+    std::vector< the::net::Connection* > connection_list;
+
+    connection_pool->enumerate(
+        [ &connection_list ]( the::net::Connection& connection )
+        {
+          connection_list.push_back( &connection );
+        });
+
+    for ( auto connection : checker->new_connections )
+    {
+      AssertThat( connection_list, Contains( connection ) );
+    }
+  }
+
   std::unique_ptr< ConnectionPoolChecker > checker;
   std::unique_ptr< the::net::ConnectionPool > connection_pool;
   std::vector< test::Socket::Pointer > sockets;
