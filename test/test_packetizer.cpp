@@ -46,58 +46,58 @@ namespace
   };
 }
 
-Describe(a_packetizer)
+Describe(an_incoming_packetizer)
 {
   void SetUp()
   {
     MessageParser::reset();
     upper_layer.reset( new UpperLayer );
-    buffer.reset( new the::net::Packetizer<MessageParser,UpperLayer>( *upper_layer ) );
+    incoming_packetizer.reset( new the::net::packetizer::Incoming<MessageParser,UpperLayer>( *upper_layer ) );
   }
 
   It( is_able_to_receive_data )
   {
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
   }
 
   It( should_ask_message_parser_if_a_message_is_complete )
   {
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
     AssertThat( MessageParser::parse_had_been_called, Equals( true ) );
   }
 
   It( should_accumulate_read_data_if_a_message_is_not_complete )
   {
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
     AssertThat( MessageParser::message_to_check, Equals( test_message ) );
 
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
     AssertThat( MessageParser::message_to_check, Equals( test_message + test_message ) );
   }
 
   It( should_remove_complete_message_from_the_buffer )
   {
     MessageParser::end_of_message = test_message.length();
-    buffer->receive( test_message.c_str(), test_message.length() );
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
     AssertThat( MessageParser::message_to_check, Equals( test_message ) );
   }
 
   It( should_call_message_ready_callback_with_the_complete_message )
   {
     MessageParser::end_of_message = test_message.length();
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
     AssertThat( upper_layer->passed_message, Equals( test_message ) );
   }
 
   It( should_call_message_ready_callback_only_if_the_message_is_complete )
   {
     MessageParser::end_of_message = 0;
-    buffer->receive( test_message.c_str(), test_message.length() );
+    incoming_packetizer->receive( test_message.c_str(), test_message.length() );
     AssertThat( upper_layer->was_not_called, Equals( true ) );
   }
 
-  std::unique_ptr< the::net::Packetizer<MessageParser,UpperLayer> > buffer;
+  std::unique_ptr< the::net::packetizer::Incoming<MessageParser,UpperLayer> > incoming_packetizer;
   std::unique_ptr< UpperLayer > upper_layer;
   const std::string test_message{ "dog" };
 };

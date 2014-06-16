@@ -8,12 +8,14 @@ namespace the
 {
 namespace net
 {
+namespace packetizer
+{
 
 template < typename MessageParser, typename UpperLayer >
-class Packetizer
+class Incoming
 {
   public:
-    Packetizer( UpperLayer& upper_layer )
+    Incoming( UpperLayer& upper_layer )
       : m_upper_layer( upper_layer )
     {
     }
@@ -43,6 +45,7 @@ class Packetizer
     UpperLayer& m_upper_layer;
 };
 
+}
 }
 }
 
