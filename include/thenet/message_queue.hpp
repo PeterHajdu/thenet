@@ -13,7 +13,7 @@ namespace net
 class MessageQueue
 {
   public:
-    typedef std::function<size_t(const char *, size_t)> LowLevelSendCallback;
+    typedef std::function<void(Data&&)> LowLevelSendCallback;
     MessageQueue( LowLevelSendCallback );
     MessageQueue( const MessageQueue& ) = delete;
     MessageQueue& operator=( const MessageQueue& ) = delete;

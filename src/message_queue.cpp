@@ -29,7 +29,7 @@ MessageQueue::wake_up()
   Data data;
   while ( m_out_buffer.pop( data ) )
   {
-    m_low_level_send( &data[0], data.size() );
+    m_low_level_send( std::move( data ) );
   }
 }
 

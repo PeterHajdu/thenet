@@ -10,12 +10,13 @@ namespace net
 
 Connection::Connection( Socket& socket )
   : id( socket.id )
+  , m_outgoing_packetizer( socket )
   , m_message_queue(
       std::bind(
-        &Socket::send,
-        &socket,
-        std::placeholders::_1,
-        std::placeholders::_2 ) )
+        &packetizer::Outgoing::send,
+        &m_outgoing_packetizer,
+        std::placeholders::_1 ) )
+  , m_incoming_packetizer( m_message_queue )
 {
 }
 
@@ -37,7 +38,7 @@ Connection::receive( Data& data )
 void
 Connection::data_from_network( const char* data, size_t length )
 {
-  m_message_queue.message_from_network( Data( data, data + length ) );
+  m_incoming_packetizer.receive( data, length );
 }
 
 

@@ -1,6 +1,6 @@
 
 #include <igloo/igloo_alt.h>
-#include <packetizer.hpp>
+#include <thenet/packetizer.hpp>
 #include <thenet/types.hpp>
 #include <netinet/in.h>
 #include "test_socket.hpp"

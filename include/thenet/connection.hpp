@@ -2,6 +2,7 @@
 
 #include <thenet/types.hpp>
 #include <thenet/message_queue.hpp>
+#include <thenet/packetizer.hpp>
 
 #include <memory>
 
@@ -24,8 +25,11 @@ class Connection
 
     void data_from_network( const char* data, size_t length );
     void wake_up_on_network_thread();
+
   private:
+    packetizer::Outgoing m_outgoing_packetizer;
     MessageQueue m_message_queue;
+    packetizer::Incoming<MessageQueue> m_incoming_packetizer;
 };
 
 }

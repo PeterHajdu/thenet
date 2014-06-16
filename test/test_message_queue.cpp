@@ -9,10 +9,9 @@ namespace
   class LowLevelConnection
   {
     public:
-      size_t send( const char* data, size_t length )
+      void send( the::net::Data&& data )
       {
-        sent_data.emplace_back( data, data + length );
-        return length;
+        sent_data.emplace_back( std::move( data ) );
       }
 
 
@@ -44,8 +43,7 @@ Describe(a_message_queue)
           std::bind(
             &LowLevelConnection::send,
             low_level_connection.get(),
-            std::placeholders::_1,
-            std::placeholders::_2 ) ) );
+            std::placeholders::_1 ) ) );
   }
 
   the::net::Data test_data_copy()
