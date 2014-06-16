@@ -1,5 +1,5 @@
 #include <igloo/igloo_alt.h>
-#include <thenet/packetizer.hpp>
+#include <packetizer.hpp>
 #include <thenet/types.hpp>
 
 using namespace igloo;
