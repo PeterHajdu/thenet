@@ -1,4 +1,5 @@
 #include <thenet/socket_pool.hpp>
+#include <thenet/connection_pool.hpp>
 #include <unistd.h>
 #include <netdb.h>
 #include <array>
@@ -112,13 +113,8 @@ namespace the
 namespace net
 {
 
-SocketPool::SocketPool(
-    SocketEventCallback new_socket,
-    SocketEventCallback drop_socket,
-    ReadDataCallback read_data )
-  : m_new_socket_callback( new_socket )
-  , m_drop_socket_callback( drop_socket )
-  , m_read_data_callback( read_data )
+SocketPool::SocketPool( ConnectionPool& connection_pool )
+  : m_connection_pool( connection_pool )
 {
 }
 
@@ -132,13 +128,13 @@ SocketPool::listen( int port )
 void
 SocketPool::on_data_available( Socket& socket, const char* data, size_t length )
 {
-  m_read_data_callback( socket, data, length );
+  m_connection_pool.on_data_available( socket, data, length );
 }
 
 void
 SocketPool::on_new_socket( Socket::Pointer&& socket )
 {
-  m_new_socket_callback( *socket );
+  m_connection_pool.on_new_socket( *socket );
   add_socket( std::move( socket ) );
 }
 
@@ -154,7 +150,7 @@ SocketPool::add_socket( Socket::Pointer&& socket )
 void
 SocketPool::on_socket_lost( Socket& socket )
 {
-  m_drop_socket_callback( socket );
+  m_connection_pool.on_socket_lost( socket );
 
   auto new_end( std::remove_if( begin( m_poll_descriptors ), end( m_poll_descriptors ),
         [ &socket ] ( pollfd& poll_descriptor )

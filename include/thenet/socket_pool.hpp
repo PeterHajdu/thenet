@@ -15,14 +15,12 @@ namespace the
 {
 namespace net
 {
+class ConnectionPool;
 
 class SocketPool
 {
   public:
-    typedef std::function<void(Socket&)> SocketEventCallback;
-    typedef std::function<void(Socket&,const char*,size_t)> ReadDataCallback;
-
-    SocketPool( SocketEventCallback new_socket, SocketEventCallback drop_socket, ReadDataCallback read_data );
+    SocketPool( ConnectionPool& connection_pool );
     void listen( int port );
 
     //todo: implement address parsing class
@@ -33,14 +31,11 @@ class SocketPool
     void on_data_available( Socket&, const char*, size_t );
     void on_new_socket( Socket::Pointer&& socket );
   private:
+    ConnectionPool& m_connection_pool;
     void add_socket( Socket::Pointer&& socket );
 
     std::vector<pollfd> m_poll_descriptors;
     std::unordered_map<int, Socket::Pointer> m_sockets;
-
-    SocketEventCallback m_new_socket_callback;
-    SocketEventCallback m_drop_socket_callback;
-    ReadDataCallback m_read_data_callback;
 };
 
 }
