@@ -14,6 +14,7 @@ set(TEST_SOURCE_FILES
     test_connection_pool.cpp
     test_connection.cpp
     test_message.cpp
+    test_service.cpp
     )
 
 

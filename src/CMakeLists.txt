@@ -6,9 +6,10 @@ set(SOURCE_FILES
   connection_pool.cpp
   connection.cpp
   packetizer.cpp
+  service.cpp
     )
 
 add_library(thenet STATIC ${SOURCE_FILES})
-target_link_libraries(thenet ${LIBS})
+target_link_libraries(thenet pthread ${LIBS})
 install(TARGETS thenet DESTINATION lib)
 
