@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-git submodule update --init
-cmake CMakeLists.txt -DCMAKE_INSTALL_PREFIX=~/deploy && LIBRARY_PATH=~/deploy/lib make
-
