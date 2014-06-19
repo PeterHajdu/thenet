@@ -1,82 +1,15 @@
 #include <thenet/socket_pool.hpp>
 #include <thenet/connection_pool.hpp>
 #include <unistd.h>
-#include <netdb.h>
 #include <array>
 #include <string>
 #include <algorithm>
 
+#include "reading_socket.hpp"
+#include "socket_utils.hpp"
+
 namespace
 {
-  //todo: consider error handling of these system functions
-  void allow_address_reuse( int socket )
-  {
-    const int true_value( 1 );
-    setsockopt(
-        socket,
-        SOL_SOCKET,
-        SO_REUSEADDR,
-        &true_value,
-        sizeof( true_value ) );
-  }
-
-
-  sockaddr_in create_base_sockaddr( int port )
-  {
-    struct sockaddr_in address;
-    memset( &address, 0, sizeof( address ) );
-    address.sin_family = AF_INET;
-    address.sin_port = htons( port );
-    return address;
-  }
-
-
-  void bind_to_port( int port, int socket )
-  {
-    struct sockaddr_in address( create_base_sockaddr( port ) );
-    address.sin_addr.s_addr = INADDR_ANY;
-
-    bind( socket, (struct sockaddr *) &address, sizeof( address ) );
-  }
-
-
-  void listen_with_queue_length( int queue_length, int socket )
-  {
-    ::listen( socket, queue_length );
-  }
-
-
-  const int messagebuffer_size( 1000 );
-  class ReadingSocket : public the::net::Socket
-  {
-    public:
-      ReadingSocket( int socket, the::net::SocketPool& socket_pool )
-        : Socket( socket )
-        , m_socket_pool( socket_pool )
-      {
-      }
-
-      void handle_event() override
-      {
-        std::array< char, messagebuffer_size > buffer;
-        ssize_t length( 0 );
-        while (  0 < ( length = ::read( fd, &buffer[ 0 ], messagebuffer_size ) ) )
-        {
-          m_socket_pool.on_data_available( *this, &buffer[ 0 ], length );
-        }
-
-        const bool connection_lost( !length );
-        if ( connection_lost )
-        {
-          m_socket_pool.on_socket_lost( *this );
-          return;
-        }
-      }
-
-    private:
-      the::net::SocketPool& m_socket_pool;
-  };
-
 
   class ListeningSocket : public the::net::Socket
   {
@@ -85,9 +18,9 @@ namespace
         : Socket( socket( AF_INET, SOCK_STREAM, 0 ) )
         , m_socket_pool( socket_pool )
       {
-        allow_address_reuse( fd );
-        bind_to_port( port, fd );
-        listen_with_queue_length( 5, fd );
+        the::net::allow_address_reuse( *this );
+        the::net::bind_to_port( port, *this );
+        the::net::listen_with_queue_length( 5, *this );
       }
 
       virtual void handle_event() override
@@ -95,7 +28,7 @@ namespace
         struct sockaddr_in address;
         socklen_t sin_size = sizeof( address );
 
-        Socket::Pointer new_socket( new ReadingSocket(
+        Socket::Pointer new_socket( new the::net::ReadingSocket<the::net::SocketPool>(
               accept(fd, (struct sockaddr *) &address, &sin_size),
               m_socket_pool ) );
 
@@ -189,25 +122,15 @@ SocketPool::run_for( uint32_t run_for_milliseconds )
 
 bool SocketPool::connect( const std::string& address, int port )
 {
-  struct hostent *serverHost( gethostbyname( address.c_str() ) );
-
-  struct sockaddr_in serverData( create_base_sockaddr( port ) );
-  serverData.sin_family = AF_INET;
-
-  memcpy( serverHost->h_addr, &(serverData.sin_addr.s_addr), serverHost->h_length);
-
-  Socket::Pointer new_socket(
-      new ReadingSocket(
-        socket( PF_INET, SOCK_STREAM, IPPROTO_TCP ),
-        *this ) );
-
-  if ( ::connect( new_socket->fd, (struct sockaddr *)&serverData, sizeof( serverData ) ) < 0 )
+  const int new_socket( connect_socket( address, port ) );
+  if ( new_socket < 0 )
   {
     return false;
   }
-  set_non_blocking( *new_socket );
 
-  on_new_socket( std::move( new_socket ) );
+  Socket::Pointer connected_socket( new ReadingSocket<SocketPool>( new_socket, *this ) );
+  set_non_blocking( *connected_socket );
+  on_new_socket( std::move( connected_socket ) );
   return true;
 }
 
