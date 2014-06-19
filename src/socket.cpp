@@ -1,5 +1,6 @@
 #include <thenet/socket.hpp>
 #include <unistd.h>
+#include <fcntl.h>
 
 namespace
 {
@@ -21,16 +22,26 @@ Socket::Socket( int fd )
 }
 
 
+
 size_t
 Socket::send( const char* message, size_t length )
 {
-  return ::write( fd, message, length );
+  const ssize_t sent_bytes( ::write( fd, message, length ) );
+  return sent_bytes;
 }
 
 Socket::~Socket()
 {
   close( fd );
 }
+
+void
+set_non_blocking( const Socket& socket )
+{
+  const int flags( fcntl( socket.fd, F_GETFL, 0 ) );
+  fcntl( socket.fd, F_SETFL, flags | O_NONBLOCK );
+}
+
 }
 }
 

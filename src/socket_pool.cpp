@@ -59,7 +59,11 @@ namespace
       void handle_event() override
       {
         std::array< char, messagebuffer_size > buffer;
-        const size_t length( ::read( fd, &buffer[ 0 ], messagebuffer_size ) );
+        ssize_t length( 0 );
+        while (  0 < ( length = ::read( fd, &buffer[ 0 ], messagebuffer_size ) ) )
+        {
+          m_socket_pool.on_data_available( *this, &buffer[ 0 ], length );
+        }
 
         const bool connection_lost( !length );
         if ( connection_lost )
@@ -67,8 +71,6 @@ namespace
           m_socket_pool.on_socket_lost( *this );
           return;
         }
-
-        m_socket_pool.on_data_available( *this, &buffer[ 0 ], length );
       }
 
     private:
@@ -97,6 +99,7 @@ namespace
               accept(fd, (struct sockaddr *) &address, &sin_size),
               m_socket_pool ) );
 
+        set_non_blocking( *new_socket );
         m_socket_pool.on_new_socket( std::move( new_socket ) );
       }
 
@@ -202,6 +205,7 @@ bool SocketPool::connect( const std::string& address, int port )
   {
     return false;
   }
+  set_non_blocking( *new_socket );
 
   on_new_socket( std::move( new_socket ) );
   return true;

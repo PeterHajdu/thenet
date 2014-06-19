@@ -25,6 +25,9 @@ class Socket
 
     virtual void handle_event() = 0;
 };
+
+void set_non_blocking( const Socket& );
+
 }
 }
 
