@@ -10,11 +10,10 @@ namespace net
 {
 
 template < typename Owner >
-class ReadingSocket : public Socket
+class ClientSocket : public Socket
 {
   public:
-    static const int messagebuffer_size{ 1000 };
-    ReadingSocket( int socket, Owner& owner )
+    ClientSocket( int socket, Owner& owner )
       : Socket( socket )
       , m_owner( owner )
     {
@@ -22,11 +21,10 @@ class ReadingSocket : public Socket
 
     void handle_event() override
     {
-      std::array< char, messagebuffer_size > buffer;
       ssize_t length( 0 );
-      while (  0 < ( length = ::read( fd, &buffer[ 0 ], messagebuffer_size ) ) )
+      while (  0 < ( length = ::read( fd, &m_buffer[ 0 ], messagebuffer_size ) ) )
       {
-        m_owner.on_data_available( *this, &buffer[ 0 ], length );
+        m_owner.on_data_available( *this, &m_buffer[ 0 ], length );
       }
 
       const bool connection_lost( !length );
@@ -39,6 +37,8 @@ class ReadingSocket : public Socket
 
   private:
     Owner& m_owner;
+    static const int messagebuffer_size{ 1000 };
+    std::array< char, messagebuffer_size > m_buffer;
 };
 
 }

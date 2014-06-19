@@ -1,10 +1,10 @@
 #include <thenet/socket_pool.hpp>
 #include <thenet/connection_pool.hpp>
+#include <thenet/client_socket.hpp>
 #include <unistd.h>
 #include <string>
 #include <algorithm>
 
-#include "reading_socket.hpp"
 #include "socket_utils.hpp"
 
 namespace
@@ -27,7 +27,7 @@ namespace
         struct sockaddr_in address;
         socklen_t sin_size = sizeof( address );
 
-        Socket::Pointer new_socket( new the::net::ReadingSocket<the::net::SocketPool>(
+        Socket::Pointer new_socket( new the::net::ClientSocket<the::net::SocketPool>(
               accept(fd, (struct sockaddr *) &address, &sin_size),
               m_socket_pool ) );
 
@@ -127,7 +127,7 @@ bool SocketPool::connect( const std::string& address, int port )
     return false;
   }
 
-  Socket::Pointer connected_socket( new ReadingSocket<SocketPool>( new_socket, *this ) );
+  Socket::Pointer connected_socket( new ClientSocket<SocketPool>( new_socket, *this ) );
   set_non_blocking( *connected_socket );
   on_new_socket( std::move( connected_socket ) );
   return true;

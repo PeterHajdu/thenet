@@ -1,8 +1,8 @@
 #include <thenet/standalone_connection.hpp>
 #include <thenet/connection.hpp>
 #include <thenet/thread_raii.hpp>
+#include <thenet/client_socket.hpp>
 #include "socket_utils.hpp"
-#include "reading_socket.hpp"
 
 
 namespace
@@ -48,7 +48,7 @@ StandaloneConnection::connect()
   }
 
   m_socket.reset(
-      new ReadingSocket< StandaloneConnection >(
+      new ClientSocket< StandaloneConnection >(
         connected_socket,
         *this ) );
 
