@@ -1,7 +1,7 @@
+#include <thenet/socket_utils.hpp>
 #include <thenet/socket.hpp>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include "socket_utils.hpp"
 
 #include <string>
 

@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
+#include <string>
 
 namespace the
 {

@@ -2,7 +2,7 @@
 #include <thenet/connection.hpp>
 #include <thenet/thread_raii.hpp>
 #include <thenet/client_socket.hpp>
-#include "socket_utils.hpp"
+#include <thenet/socket_utils.hpp>
 
 
 namespace

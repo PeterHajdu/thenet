@@ -1,11 +1,11 @@
 #include <thenet/socket_pool.hpp>
 #include <thenet/connection_pool.hpp>
 #include <thenet/client_socket.hpp>
+#include <thenet/socket_utils.hpp>
+
 #include <unistd.h>
 #include <string>
 #include <algorithm>
-
-#include "socket_utils.hpp"
 
 namespace
 {
