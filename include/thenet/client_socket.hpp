@@ -1,5 +1,7 @@
 #pragma once
 
+#include <thenet/socket.hpp>
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <array>
