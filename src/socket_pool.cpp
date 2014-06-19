@@ -10,10 +10,10 @@
 namespace
 {
 
-  class ListeningSocket : public the::net::Socket
+  class ServerSocket : public the::net::Socket
   {
     public:
-      ListeningSocket( int port, the::net::SocketPool& socket_pool )
+      ServerSocket( int port, the::net::SocketPool& socket_pool )
         : Socket( socket( AF_INET, SOCK_STREAM, 0 ) )
         , m_socket_pool( socket_pool )
       {
@@ -57,7 +57,7 @@ SocketPool::SocketPool( ConnectionPool& connection_pool )
 void
 SocketPool::listen( int port )
 {
-  add_socket( Socket::Pointer( new ListeningSocket( port, *this ) ) );
+  add_socket( Socket::Pointer( new ServerSocket( port, *this ) ) );
 }
 
 void
