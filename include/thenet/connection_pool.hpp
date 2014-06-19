@@ -22,7 +22,7 @@ class ConnectionPool
 
     void on_new_socket( Socket& new_socket );
     void on_socket_lost( Socket& lost_socket );
-    void on_data_available( Socket& lost_socket, const char* data, size_t length );
+    void on_data_available( Socket& socket, const char* data, size_t length );
 
     void wake_up_on_network_thread() const;
 

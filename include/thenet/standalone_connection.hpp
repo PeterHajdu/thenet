@@ -26,7 +26,7 @@ class StandaloneConnection
     bool receive( Data& );
 
     void on_socket_lost( Socket& lost_socket );
-    void on_data_available( Socket& lost_socket, const char* data, size_t length );
+    void on_data_available( Socket& socket, const char* data, size_t length );
   private:
     const std::string m_host;
     const int m_port;
