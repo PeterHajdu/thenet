@@ -19,6 +19,7 @@ class Socket
     virtual ~Socket();
 
     size_t send( const char* message, size_t length );
+    void close();
 
     const int fd;
     const int id;

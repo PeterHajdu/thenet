@@ -1,6 +1,8 @@
 #include <thenet/socket.hpp>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 namespace
 {
@@ -32,7 +34,14 @@ Socket::send( const char* message, size_t length )
 
 Socket::~Socket()
 {
-  close( fd );
+  close();
+}
+
+void
+Socket::close()
+{
+  shutdown( fd, SHUT_RDWR );
+  ::close( fd );
 }
 
 void

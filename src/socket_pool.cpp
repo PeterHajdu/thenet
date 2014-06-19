@@ -1,7 +1,6 @@
 #include <thenet/socket_pool.hpp>
 #include <thenet/connection_pool.hpp>
 #include <unistd.h>
-#include <array>
 #include <string>
 #include <algorithm>
 

@@ -30,7 +30,6 @@ class Socket : public the::net::Socket
 
     ~Socket()
     {
-      close( test_file_descriptor );
     }
 
     the::net::Data sent_message()

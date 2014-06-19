@@ -3,68 +3,21 @@ using namespace igloo;
 
 #include <thenet/service.hpp>
 #include "test_message.hpp"
-
-namespace
-{
-  class ServiceChecker
-  {
-    public:
-      ServiceChecker()
-        : service(
-            std::bind(
-              &ServiceChecker::on_new_connection,
-              this,
-              std::placeholders::_1 ),
-            std::bind(
-              &ServiceChecker::on_connection_lost,
-              this,
-              std::placeholders::_1 ) )
-      {
-      }
-
-      void on_new_connection( the::net::Connection& connection )
-      {
-        new_connection_was_established = true;
-        connections.push_back( &connection );
-      }
-
-      void on_connection_lost( the::net::Connection& connection )
-      {
-        connection_was_lost = true;
-      }
-
-      void send_data( const the::net::Data& data )
-      {
-        connections.back()->send( the::net::Data( data ) );
-      }
-
-      the::net::Data received_data()
-      {
-        the::net::Data message;
-        connections.back()->receive( message );
-        return message;
-      }
-
-      the::net::Service service;
-      bool new_connection_was_established{ false };
-      bool connection_was_lost{ false };
-      std::vector< the::net::Connection* > connections;
-  };
-}
+#include "service_checker.hpp"
 
 Describe( a_service )
 {
 
   void set_up_server()
   {
-    server.reset( new ServiceChecker() );
+    server.reset( new test::ServiceChecker() );
     server->service.listen_on( test_port );
     server->service.start();
   }
 
   void set_up_client()
   {
-    client.reset( new ServiceChecker() );
+    client.reset( new test::ServiceChecker() );
     client->service.connect_to( test_host, test_port );
     client->service.start();
   }
@@ -135,7 +88,7 @@ Describe( a_service )
   const test::Message test_message{ "dog food" };
   const std::string test_host{ "localhost" };
   const int test_port{ 2000 };
-  std::unique_ptr< ServiceChecker > server;
-  std::unique_ptr< ServiceChecker > client;
+  std::unique_ptr< test::ServiceChecker > server;
+  std::unique_ptr< test::ServiceChecker > client;
 };
 

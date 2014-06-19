@@ -1,5 +1,9 @@
 #pragma once
 
+#include <sys/types.h>
+#include <unistd.h>
+#include <array>
+
 namespace the
 {
 namespace net
