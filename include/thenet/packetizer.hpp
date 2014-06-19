@@ -27,10 +27,19 @@ class Incoming
     {
       m_buffer.insert( std::end( m_buffer ), buffer, buffer + length );
 
+      while( try_to_extract_message() )
+      {
+      }
+    }
+
+
+  private:
+    bool try_to_extract_message()
+    {
       const size_t end_of_message( parse_message() );
       if ( incomplete_message == end_of_message )
       {
-        return;
+        return false;
       }
 
       m_upper_layer.message_from_network(
@@ -39,10 +48,10 @@ class Incoming
       m_buffer.erase(
           std::begin( m_buffer ),
           std::begin( m_buffer ) + end_of_message );
+
+      return true;
     }
 
-
-  private:
     size_t parse_message()
     {
       if ( m_buffer.size() < header_length )

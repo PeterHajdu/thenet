@@ -15,12 +15,17 @@ namespace
     public:
       void message_from_network( the::net::Data&& data )
       {
-        passed_message = std::string( begin( data ), end( data ) );
+        passed_messages.push_back( std::string( begin( data ), end( data ) ) );
         was_not_called = false;
       }
 
-      std::string passed_message;
+      const std::string last_message() const
+      {
+        return passed_messages.back();
+      }
+
       bool was_not_called{ true };
+      std::vector< std::string > passed_messages;
   };
 }
 
@@ -55,14 +60,14 @@ Describe(an_incoming_packetizer)
   It( should_call_message_ready_callback_with_the_complete_message )
   {
     receive_data( test_message->network );
-    AssertThat( upper_layer->passed_message, Equals( test_message->plain ) );
+    AssertThat( upper_layer->last_message(), Equals( test_message->plain ) );
   }
 
   It( should_accumulate_read_data_if_a_message_is_not_complete )
   {
     receive_data( network_first_part );
     receive_data( network_second_part );
-    AssertThat( upper_layer->passed_message, Equals( test_message->plain ) );
+    AssertThat( upper_layer->last_message(), Equals( test_message->plain ) );
   }
 
   It( should_call_message_ready_callback_only_if_the_message_is_complete )
@@ -76,7 +81,17 @@ Describe(an_incoming_packetizer)
     receive_data( test_message->network );
     set_up_test_message( "another test message" );
     receive_data( test_message->network );
-    AssertThat( upper_layer->passed_message, Equals( test_message->plain ) );
+    AssertThat( upper_layer->last_message(), Equals( test_message->plain ) );
+  }
+
+  It( should_handle_more_packets_in_a_buffer )
+  {
+    test::Message second_message( "second test message" );
+    const std::string two_packets( test_message->network + second_message.network );
+    receive_data( two_packets );
+    AssertThat( upper_layer->passed_messages.size(), Equals( 2u ) );
+    AssertThat( upper_layer->passed_messages[0], Equals( test_message->plain ) );
+    AssertThat( upper_layer->passed_messages[1], Equals( second_message.plain ) );
   }
 
   std::unique_ptr< the::net::packetizer::Incoming<UpperLayer> > incoming_packetizer;
@@ -117,7 +132,7 @@ Describe(an_outgoing_packetizer)
     const the::net::Data sent_message( socket->sent_message() );
 
     incoming_packetizer.receive( &sent_message[0], sent_message.size() );
-    AssertThat( upper_layer.passed_message, Equals( test_message.plain ) );
+    AssertThat( upper_layer.last_message(), Equals( test_message.plain ) );
   }
 
   test::Socket::Pointer socket;
