@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 
 #include <string>
+#include <cstring>
 
 namespace the
 {
