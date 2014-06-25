@@ -16,6 +16,7 @@ set(TEST_SOURCE_FILES
     test_message.cpp
     test_service.cpp
     test_standalone_connection.cpp
+    test_address.cpp
     service_checker.cpp
     )
 

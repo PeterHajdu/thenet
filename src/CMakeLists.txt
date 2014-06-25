@@ -9,6 +9,7 @@ set(SOURCE_FILES
   service.cpp
   socket_utils.cpp
   standalone_connection.cpp
+  address.cpp
     )
 
 add_library(thenet STATIC ${SOURCE_FILES})
