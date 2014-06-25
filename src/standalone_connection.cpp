@@ -25,11 +25,8 @@ namespace the
 namespace net
 {
 
-StandaloneConnection::StandaloneConnection(
-    const std::string& host,
-    int port )
-  : m_host( host )
-  , m_port( port )
+StandaloneConnection::StandaloneConnection( const Address& address )
+  : m_address( address )
 {
 }
 
@@ -41,7 +38,7 @@ StandaloneConnection::~StandaloneConnection()
 void
 StandaloneConnection::connect()
 {
-  const int connected_socket( connect_socket( m_host, m_port ) );
+  const int connected_socket( connect_socket( m_address ) );
   if ( connected_socket < 0 )
   {
     return;

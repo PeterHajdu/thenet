@@ -38,9 +38,9 @@ Service::listen_on( int port )
 }
 
 void
-Service::connect_to( const std::string& host, int port )
+Service::connect_to( const Address& address )
 {
-  m_socket_pool.connect( host, port );
+  m_socket_pool.connect( address );
 }
 
 }

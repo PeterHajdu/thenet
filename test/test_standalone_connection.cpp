@@ -12,13 +12,13 @@ Describe( a_standalone_connection )
   void set_up_server()
   {
     server.reset( new test::ServiceChecker() );
-    server->service.listen_on( test_port );
+    server->service.listen_on( the::net::Address( test_address ).port );
     server->service.start();
   }
 
   void set_up_connection()
   {
-    connection.reset( new the::net::StandaloneConnection( test_host, test_port ) );
+    connection.reset( new the::net::StandaloneConnection( test_address ) );
     connection->connect();
   }
 
@@ -56,8 +56,7 @@ Describe( a_standalone_connection )
   }
 
   const test::Message test_message{ "dog food" };
-  const std::string test_host{ "localhost" };
-  const int test_port{ 2000 };
+  const std::string test_address{ "localhost:2000" };
   std::unique_ptr< test::ServiceChecker > server;
   std::unique_ptr< the::net::StandaloneConnection > connection;
 };

@@ -16,6 +16,7 @@ namespace the
 namespace net
 {
 class ConnectionPool;
+class Address;
 
 class SocketPool
 {
@@ -23,8 +24,7 @@ class SocketPool
     SocketPool( ConnectionPool& connection_pool );
     void listen( int port );
 
-    //todo: implement address parsing class
-    bool connect( const std::string& address, int port );
+    bool connect( const Address& address );
     void run_for( uint32_t run_for_milliseconds );
 
     void on_socket_lost( Socket& socket );

@@ -2,6 +2,7 @@
 using namespace igloo;
 
 #include <thenet/service.hpp>
+#include <thenet/address.hpp>
 #include "test_message.hpp"
 #include "service_checker.hpp"
 
@@ -11,14 +12,14 @@ Describe( a_service )
   void set_up_server()
   {
     server.reset( new test::ServiceChecker() );
-    server->service.listen_on( test_port );
+    server->service.listen_on( the::net::Address( test_address ).port );
     server->service.start();
   }
 
   void set_up_client()
   {
     client.reset( new test::ServiceChecker() );
-    client->service.connect_to( test_host, test_port );
+    client->service.connect_to( test_address );
     client->service.start();
   }
 
@@ -86,8 +87,7 @@ Describe( a_service )
   }
 
   const test::Message test_message{ "dog food" };
-  const std::string test_host{ "localhost" };
-  const int test_port{ 2000 };
+  const std::string test_address{ "localhost:2000" };
   std::unique_ptr< test::ServiceChecker > server;
   std::unique_ptr< test::ServiceChecker > client;
 };

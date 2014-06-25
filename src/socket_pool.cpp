@@ -2,6 +2,7 @@
 #include <thenet/connection_pool.hpp>
 #include <thenet/client_socket.hpp>
 #include <thenet/socket_utils.hpp>
+#include <thenet/address.hpp>
 
 #include <unistd.h>
 #include <string>
@@ -119,9 +120,9 @@ SocketPool::run_for( uint32_t run_for_milliseconds )
 }
 
 
-bool SocketPool::connect( const std::string& address, int port )
+bool SocketPool::connect( const Address& address )
 {
-  const int new_socket( connect_socket( address, port ) );
+  const int new_socket( connect_socket( address ) );
   if ( new_socket < 0 )
   {
     return false;

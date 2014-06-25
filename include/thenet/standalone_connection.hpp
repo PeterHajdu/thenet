@@ -2,6 +2,7 @@
 
 #include <thenet/socket.hpp>
 #include <thenet/types.hpp>
+#include <thenet/address.hpp>
 #include <string>
 
 namespace the
@@ -14,11 +15,12 @@ class Outgoing;
 }
 class Connection;
 class ThreadRaii;
+class Address;
 
 class StandaloneConnection
 {
   public:
-    StandaloneConnection( const std::string& host, int port );
+    StandaloneConnection( const Address& address );
     ~StandaloneConnection();
 
     void connect();
@@ -28,8 +30,7 @@ class StandaloneConnection
     void on_socket_lost( Socket& lost_socket );
     void on_data_available( Socket& socket, const char* data, size_t length );
   private:
-    const std::string m_host;
-    const int m_port;
+    const Address m_address;
 
     Socket::Pointer m_socket;
     std::unique_ptr< Connection > m_connection;

@@ -10,6 +10,7 @@ namespace the
 {
 namespace net
 {
+class Address;
 
 class Service
 {
@@ -26,7 +27,7 @@ class Service
     void start();
 
     void listen_on( int port );
-    void connect_to( const std::string& host, int port );
+    void connect_to( const Address& address );
 
     template < typename functor >
     void enumerate( functor enumerator );
