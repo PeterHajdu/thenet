@@ -55,7 +55,7 @@ int connect_socket( const Address& address )
   struct hostent *serverHost( gethostbyname( address.host.c_str() ) );
   struct sockaddr_in serverData( create_base_sockaddr( address.port ) );
   serverData.sin_family = AF_INET;
-  memcpy( serverHost->h_addr, &(serverData.sin_addr.s_addr), serverHost->h_length );
+  memcpy(  &(serverData.sin_addr.s_addr), serverHost->h_addr, serverHost->h_length );
   const int new_socket( socket( PF_INET, SOCK_STREAM, IPPROTO_TCP ) );
   if ( ::connect( new_socket, (struct sockaddr *)&serverData, sizeof( serverData ) ) < 0 )
   {
