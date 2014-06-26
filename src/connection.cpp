@@ -15,7 +15,7 @@ Connection::Connection( Socket& socket )
         &packetizer::Outgoing::send,
         &m_outgoing_packetizer,
         std::placeholders::_1 ) )
-  , m_incoming_packetizer( m_message_queue )
+  , m_incoming_packetizer( *this )
 {
 }
 
@@ -42,11 +42,34 @@ Connection::data_from_network( const char* data, size_t length )
 
 
 void
+Connection::message_from_network( Data&& message )
+{
+  for ( auto& task : m_tasks )
+  {
+    task->on_message_from_network( message );
+  }
+
+  m_message_queue.message_from_network( std::move( message ) );
+}
+
+
+void
 Connection::wake_up_on_network_thread()
 {
+  for ( auto& task : m_tasks )
+  {
+    task->wake_up();
+  }
+
   m_message_queue.wake_up();
 }
 
+
+void
+Connection::register_task( NetworkTask::Pointer&& task )
+{
+  m_tasks.emplace_back( std::move( task ) );
+}
 
 }
 }

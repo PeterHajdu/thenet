@@ -3,6 +3,7 @@
 #include <thenet/types.hpp>
 #include <thenet/message_queue.hpp>
 #include <thenet/packetizer.hpp>
+#include <thenet/network_task.hpp>
 
 #include <memory>
 
@@ -24,12 +25,18 @@ class Connection
     bool receive( Data& );
 
     void data_from_network( const char* data, size_t length );
+    void message_from_network( Data&& message );
     void wake_up_on_network_thread();
 
+    void register_task( NetworkTask::Pointer&& task );
+
   private:
+
     packetizer::Outgoing m_outgoing_packetizer;
     MessageQueue m_message_queue;
-    packetizer::Incoming<MessageQueue> m_incoming_packetizer;
+    packetizer::Incoming<Connection> m_incoming_packetizer;
+
+    std::vector< NetworkTask::Pointer > m_tasks;
 };
 
 }

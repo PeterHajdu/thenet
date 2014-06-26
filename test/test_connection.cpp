@@ -1,11 +1,34 @@
+#include <thenet/connection.hpp>
+#include <thenet/types.hpp>
+
 #include <igloo/igloo_alt.h>
 using namespace igloo;
 
 #include <netinet/in.h>
-#include <thenet/connection.hpp>
-#include <thenet/types.hpp>
 #include "test_socket.hpp"
 #include "test_message.hpp"
+
+#include <memory>
+
+namespace
+{
+  class TestTask : public the::net::NetworkTask
+  {
+    public:
+      bool was_waken_up{ false };
+      virtual void wake_up() override
+      {
+        was_waken_up = true;
+      }
+
+      std::string passed_message;
+      virtual void on_message_from_network( const the::net::Data& message ) override
+      {
+        passed_message = std::string( begin( message ), end( message ) );
+      }
+
+  };
+}
 
 Describe( a_connection )
 {
@@ -61,9 +84,40 @@ Describe( a_connection )
     AssertThat( connection_has_test_message(), Equals( true ) );
   }
 
+  It( is_possible_to_register_network_tasks_to_a_connection )
+  {
+    connection->register_task( std::unique_ptr<TestTask>( new TestTask() ) );
+  }
+
+  TestTask* register_test_task()
+  {
+    std::unique_ptr<TestTask> task( new TestTask() );
+    TestTask* task_pointer( task.get() );
+    connection->register_task( std::move( task ) );
+    AssertThat( task_pointer->was_waken_up, Equals( false ) );
+    return task_pointer;
+  }
+
+  It( wakes_up_all_registered_network_tasks )
+  {
+    TestTask* first_task( register_test_task() );
+    TestTask* second_task( register_test_task() );
+    connection->wake_up_on_network_thread();
+    AssertThat( first_task->was_waken_up, Equals( true ) );
+    AssertThat( second_task->was_waken_up, Equals( true ) );
+  }
+
+  It( passes_incoming_messages_to_registered_network_tasks )
+  {
+    TestTask* first_task( register_test_task() );
+    TestTask* second_task( register_test_task() );
+    connection->data_from_network( &message.network[0], message.network.size() );
+    AssertThat( first_task->passed_message, Equals( message.plain ) );
+    AssertThat( second_task->passed_message, Equals( message.plain ) );
+  }
+
   test::Message message{ "test" };
   std::unique_ptr< test::Socket > socket;
   the::net::Connection::Pointer connection;
-
 };
 
