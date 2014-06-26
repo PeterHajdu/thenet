@@ -24,7 +24,7 @@ namespace
       std::string passed_message;
       virtual void on_message_from_network( const the::net::Data& message ) override
       {
-        passed_message = std::string( begin( message ), end( message ) );
+        std::string( begin( message ), end( message ) ).swap( passed_message );
       }
 
   };
