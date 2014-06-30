@@ -1,5 +1,6 @@
 #pragma once
 
+#include <thenet/types.hpp>
 #include <memory>
 
 namespace the
