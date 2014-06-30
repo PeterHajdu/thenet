@@ -70,6 +70,12 @@ Describe( a_connection )
     AssertThat( socket->sent_message(), Equals( message.network_data ) );
   }
 
+  It( is_possible_to_send_data_from_network_thread )
+  {
+    connection->send_on_network_thread( copy_of_test_message() );
+    AssertThat( socket->sent_message(), Equals( message.network_data ) );
+  }
+
   bool connection_has_test_message()
   {
     the::net::Data buffer;

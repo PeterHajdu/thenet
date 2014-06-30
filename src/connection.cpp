@@ -12,8 +12,8 @@ Connection::Connection( Socket& socket )
   , m_outgoing_packetizer( socket )
   , m_message_queue(
       std::bind(
-        &packetizer::Outgoing::send,
-        &m_outgoing_packetizer,
+        &Connection::send_on_network_thread,
+        this,
         std::placeholders::_1 ) )
   , m_incoming_packetizer( *this )
 {
@@ -62,6 +62,12 @@ Connection::wake_up_on_network_thread()
   }
 
   m_message_queue.wake_up();
+}
+
+void
+Connection::send_on_network_thread( Data&& data )
+{
+  m_outgoing_packetizer.send( std::move( data ) );
 }
 
 

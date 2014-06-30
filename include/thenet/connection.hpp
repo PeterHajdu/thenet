@@ -24,6 +24,8 @@ class Connection
     bool send( Data&& );
     bool receive( Data& );
 
+    void send_on_network_thread( Data&& );
+
     void data_from_network( const char* data, size_t length );
     void message_from_network( Data&& message );
     void wake_up_on_network_thread();
