@@ -36,7 +36,7 @@ MessageQueue::wake_up()
 void
 MessageQueue::message_from_network( Data&& data )
 {
-  m_in_buffer.push( data );
+  m_in_buffer.push( std::move( data ) );
 }
 
 }
