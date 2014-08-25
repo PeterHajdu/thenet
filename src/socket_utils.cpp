@@ -53,6 +53,11 @@ void listen_with_queue_length( int queue_length, const Socket&  socket )
 int connect_socket( const Address& address )
 {
   struct hostent *serverHost( gethostbyname( address.host.c_str() ) );
+  if ( nullptr == serverHost )
+  {
+    return -1;
+  }
+
   struct sockaddr_in serverData( create_base_sockaddr( address.port ) );
   serverData.sin_family = AF_INET;
   memcpy(  &(serverData.sin_addr.s_addr), serverHost->h_addr, serverHost->h_length );
