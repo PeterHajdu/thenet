@@ -2,6 +2,7 @@ src/libthenet.a
 test/test_runner
 test/valgrind.log
 
+*core*
 *swp
 *.cmake
 Makefile
