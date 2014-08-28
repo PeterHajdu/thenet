@@ -16,7 +16,16 @@ Connection::Connection( Socket& socket )
         this,
         std::placeholders::_1 ) )
   , m_incoming_packetizer( *this )
+  , m_should_drop( false )
+  , m_socket( socket )
 {
+}
+
+
+void
+Connection::drop()
+{
+  m_should_drop = true;
 }
 
 
@@ -56,6 +65,12 @@ Connection::message_from_network( Data&& message )
 void
 Connection::wake_up_on_network_thread()
 {
+  if ( m_should_drop )
+  {
+    m_socket.drop();
+    return;
+  }
+
   for ( auto& task : m_tasks )
   {
     task->wake_up();

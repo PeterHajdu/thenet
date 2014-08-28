@@ -49,5 +49,11 @@ ServiceChecker::received_data()
   return message;
 }
 
+void
+ServiceChecker::drop_connection()
+{
+  connections.back()->drop();
+}
+
 }
 

@@ -56,6 +56,12 @@ class Socket : public the::net::Socket
     {
     }
 
+    bool was_dropped{ false };
+    virtual void drop() override
+    {
+      was_dropped = true;
+    }
+
   private:
     Socket( int fd, int test_file_descriptor )
       : the::net::Socket( fd )

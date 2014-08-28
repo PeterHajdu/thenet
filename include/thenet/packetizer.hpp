@@ -36,9 +36,15 @@ class Incoming
   private:
     bool try_to_extract_message()
     {
-      const size_t end_of_message( parse_message() );
+      const ssize_t end_of_message( parse_message() );
       if ( incomplete_message == end_of_message )
       {
+        return false;
+      }
+
+      if ( invalid_message == end_of_message )
+      {
+        m_upper_layer.drop();
         return false;
       }
 
@@ -52,7 +58,7 @@ class Incoming
       return true;
     }
 
-    size_t parse_message()
+    ssize_t parse_message()
     {
       if ( m_buffer.size() < header_length )
       {
@@ -60,6 +66,11 @@ class Incoming
       }
 
       const uint32_t message_length( ntohl( *( reinterpret_cast<uint32_t*>( &m_buffer[0] ) ) ) );
+
+      if ( message_length > allowed_message_size )
+      {
+        return invalid_message;
+      }
 
       if ( m_buffer.size() < message_length + header_length )
       {
@@ -73,8 +84,10 @@ class Incoming
     //todo: consider other container, messages are going to be erased from the beginning of the buffer
     Data m_buffer;
     UpperLayer& m_upper_layer;
-    static const size_t incomplete_message{ 0 };
+    static const ssize_t incomplete_message{ 0 };
+    static const ssize_t invalid_message{ -1 };
     static const size_t header_length{ sizeof( uint32_t ) };
+    static const size_t allowed_message_size{ 4096u };
 };
 
 class Outgoing

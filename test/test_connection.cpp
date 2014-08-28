@@ -122,6 +122,14 @@ Describe( a_connection )
     AssertThat( second_task->passed_message, Equals( message.plain ) );
   }
 
+  It( drops_corresponding_socket_on_network_thread_after_being_dropped )
+  {
+    connection->drop();
+    AssertThat( socket->was_dropped, Equals( false ) );
+    connection->wake_up_on_network_thread();
+    AssertThat( socket->was_dropped, Equals( true ) );
+  }
+
   test::Message message{ "test" };
   std::unique_ptr< test::Socket > socket;
   the::net::Connection::Pointer connection;

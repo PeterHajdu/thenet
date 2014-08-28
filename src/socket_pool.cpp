@@ -36,6 +36,9 @@ namespace
         m_socket_pool.on_new_socket( std::move( new_socket ) );
       }
 
+      virtual void drop() override
+      {
+      }
 
     private:
       the::net::SocketPool& m_socket_pool;

@@ -18,6 +18,7 @@ class ServiceChecker
 {
   public:
     ServiceChecker();
+    void drop_connection();
     void on_new_connection( the::net::Connection& connection );
     void on_connection_lost( the::net::Connection& connection );
     void send_data( const the::net::Data& data );

@@ -18,6 +18,7 @@ class Socket
 
     virtual ~Socket();
 
+    virtual void drop() = 0;
     size_t send( const char* message, size_t length );
     void close();
 

@@ -21,6 +21,7 @@ class Connection
     Connection( Socket& );
     const int id;
 
+    void drop();
     bool send( Data&& );
     bool receive( Data& );
 
@@ -39,6 +40,9 @@ class Connection
     packetizer::Incoming<Connection> m_incoming_packetizer;
 
     std::vector< NetworkTask::Pointer > m_tasks;
+
+    bool m_should_drop;
+    Socket& m_socket;
 };
 
 }

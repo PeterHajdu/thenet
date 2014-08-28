@@ -86,6 +86,14 @@ Describe( a_service )
     AssertThat( connections.back(), Equals( server->connections.back() ) );
   }
 
+  It( closes_tcp_connection_if_connection_is_dropped )
+  {
+    client->drop_connection();
+    sleep();
+    AssertThat( client->connection_was_lost, Equals( true ) );
+    AssertThat( server->connection_was_lost, Equals( true ) );
+  }
+
   const test::Message test_message{ "dog food" };
   const std::string test_address{ "localhost:2000" };
   std::unique_ptr< test::ServiceChecker > server;

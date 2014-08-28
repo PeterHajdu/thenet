@@ -26,6 +26,12 @@ namespace
 
       bool was_not_called{ true };
       std::vector< std::string > passed_messages;
+
+      bool was_dropped{ false };
+      void drop()
+      {
+        was_dropped = true;
+      }
   };
 }
 
@@ -92,6 +98,15 @@ Describe(an_incoming_packetizer)
     AssertThat( upper_layer->passed_messages.size(), Equals( 2u ) );
     AssertThat( upper_layer->passed_messages[0], Equals( test_message->plain ) );
     AssertThat( upper_layer->passed_messages[1], Equals( second_message.plain ) );
+  }
+
+  It( should_drop_upper_layer_connection_if_message_is_too_long )
+  {
+    const uint32_t message_length( 1000000u );
+    incoming_packetizer->receive(
+        reinterpret_cast< const char * >( &message_length ),
+        sizeof( uint32_t ) );
+    AssertThat( upper_layer->was_dropped, Equals( true ) );
   }
 
   std::unique_ptr< the::net::packetizer::Incoming<UpperLayer> > incoming_packetizer;

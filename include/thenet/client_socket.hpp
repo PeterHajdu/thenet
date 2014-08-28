@@ -37,6 +37,12 @@ class ClientSocket : public Socket
       }
     }
 
+    virtual void drop() override
+    {
+      m_owner.on_socket_lost( *this );
+      return;
+    }
+
   private:
     Owner& m_owner;
     static const int messagebuffer_size{ 1000 };
