@@ -39,8 +39,7 @@ class ClientSocket : public Socket
 
     virtual void drop() override
     {
-      m_owner.on_socket_lost( *this );
-      return;
+      m_owner.drop_socket( *this );
     }
 
   private:

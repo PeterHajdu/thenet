@@ -27,6 +27,7 @@ class StandaloneConnection
     bool send( Data&& );
     bool receive( Data& );
 
+    void drop_socket( Socket& socket );
     void on_socket_lost( Socket& lost_socket );
     void on_data_available( Socket& socket, const char* data, size_t length );
   private:

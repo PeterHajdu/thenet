@@ -63,6 +63,12 @@ StandaloneConnection::connect()
 
 
 void
+StandaloneConnection::drop_socket( Socket& socket )
+{
+}
+
+
+void
 StandaloneConnection::on_socket_lost( Socket& lost_socket )
 {
 }

@@ -8,6 +8,7 @@
 #include <poll.h>
 #include <algorithm>
 #include <memory>
+#include <functional>
 
 #include <thenet/socket.hpp>
 
@@ -27,6 +28,7 @@ class SocketPool
     bool connect( const Address& address );
     void run_for( uint32_t run_for_milliseconds );
 
+    void drop_socket( Socket& socket );
     void on_socket_lost( Socket& socket );
     void on_data_available( Socket&, const char*, size_t );
     void on_new_socket( Socket::Pointer&& socket );
@@ -36,6 +38,7 @@ class SocketPool
 
     std::vector<pollfd> m_poll_descriptors;
     std::unordered_map<int, Socket::Pointer> m_sockets;
+    std::vector< std::reference_wrapper< Socket > > m_sockets_to_be_dropped;
 };
 
 }

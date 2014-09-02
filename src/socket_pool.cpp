@@ -87,6 +87,13 @@ SocketPool::add_socket( Socket::Pointer&& socket )
 
 
 void
+SocketPool::drop_socket( Socket& socket )
+{
+  m_sockets_to_be_dropped.emplace_back( socket );
+}
+
+
+void
 SocketPool::on_socket_lost( Socket& socket )
 {
   m_connection_pool.on_socket_lost( socket );
@@ -104,6 +111,12 @@ SocketPool::on_socket_lost( Socket& socket )
 void
 SocketPool::run_for( uint32_t run_for_milliseconds )
 {
+  for ( auto& socket : m_sockets_to_be_dropped )
+  {
+    on_socket_lost( socket );
+  }
+  m_sockets_to_be_dropped.clear();
+
   if ( poll( &m_poll_descriptors[0], m_poll_descriptors.size(), run_for_milliseconds ) < 0 )
   {
     //todo: handle network error
