@@ -1,6 +1,7 @@
 src/libthenet.a
 test/test_runner
 test/valgrind.log
+package_version
 
 *core*
 *swp
