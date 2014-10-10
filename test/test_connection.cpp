@@ -5,7 +5,7 @@
 using namespace igloo;
 
 #include <netinet/in.h>
-#include "test_socket.hpp"
+#include <thenet/test_socket.hpp>
 #include "test_message.hpp"
 
 #include <memory>

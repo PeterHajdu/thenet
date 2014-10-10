@@ -4,7 +4,7 @@ using namespace igloo;
 #include <thenet/connection_pool.hpp>
 #include <thenet/socket.hpp>
 
-#include "test_socket.hpp"
+#include <thenet/test_socket.hpp>
 #include "test_message.hpp"
 
 namespace

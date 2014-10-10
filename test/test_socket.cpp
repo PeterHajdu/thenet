@@ -2,7 +2,7 @@
 using namespace igloo;
 
 #include <thenet/socket.hpp>
-#include "test_socket.hpp"
+#include <thenet/test_socket.hpp>
 
 Describe( a_socket )
 {
