@@ -34,7 +34,7 @@ class Socket : public the::net::Socket
 
     the::net::Data sent_message()
     {
-      const size_t max_size_of_message( 1000 );
+      const size_t max_size_of_message( 10000 );
       std::array< char, max_size_of_message > buffer;
       const int length_of_message(
           read(
