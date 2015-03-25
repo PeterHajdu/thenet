@@ -3,6 +3,7 @@ test/test_runner
 test/valgrind.log
 package_version
 
+*tags*
 *core*
 *swp
 *.cmake
