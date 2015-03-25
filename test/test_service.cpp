@@ -16,11 +16,18 @@ Describe( a_service )
     server->service.start();
   }
 
-  void set_up_client()
+  auto create_client()
   {
-    client.reset( new test::ServiceChecker() );
+    std::unique_ptr< test::ServiceChecker > client( new test::ServiceChecker() );
     client->service.connect_to( test_address );
     client->service.start();
+    sleep();
+    return std::move( client );
+  }
+
+  void set_up_client()
+  {
+    client = create_client();
   }
 
   void sleep()
@@ -32,7 +39,6 @@ Describe( a_service )
   {
     set_up_server();
     set_up_client();
-    sleep();
   }
 
   It( can_establish_a_connection_on_server_side )
@@ -92,6 +98,11 @@ Describe( a_service )
     sleep();
     AssertThat( client->connection_was_lost, Equals( true ) );
     AssertThat( server->connection_was_lost, Equals( true ) );
+  }
+
+  It( can_accept_many_connections )
+  {
+    auto another_client( create_client() );
   }
 
   const test::Message test_message{ "dog food" };

@@ -38,7 +38,10 @@ class SocketPool
 
     std::vector<pollfd> m_poll_descriptors;
     std::unordered_map<int, Socket::Pointer> m_sockets;
+
+    void clean_up_dropped_and_new_sockets();
     std::vector< std::reference_wrapper< Socket > > m_sockets_to_be_dropped;
+    std::vector< std::unique_ptr< Socket > > m_sockets_to_be_added;
 };
 
 }

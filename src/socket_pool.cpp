@@ -81,8 +81,7 @@ SocketPool::on_new_socket( Socket::Pointer&& socket )
 void
 SocketPool::add_socket( Socket::Pointer&& socket )
 {
-  m_poll_descriptors.emplace_back( pollfd{ socket->fd, POLLIN, 0 } );
-  m_sockets.emplace( std::make_pair( socket->fd, std::move( socket ) ) );
+  m_sockets_to_be_added.emplace_back( std::move( socket ) );
 }
 
 
@@ -109,13 +108,27 @@ SocketPool::on_socket_lost( Socket& socket )
 
 
 void
-SocketPool::run_for( uint32_t run_for_milliseconds )
+SocketPool::clean_up_dropped_and_new_sockets()
 {
   for ( auto& socket : m_sockets_to_be_dropped )
   {
     on_socket_lost( socket );
   }
   m_sockets_to_be_dropped.clear();
+
+  for ( auto& socket : m_sockets_to_be_added )
+  {
+    m_poll_descriptors.emplace_back( pollfd{ socket->fd, POLLIN, 0 } );
+    m_sockets.emplace( std::make_pair( socket->fd, std::move( socket ) ) );
+  }
+  m_sockets_to_be_added.clear();
+}
+
+
+void
+SocketPool::run_for( uint32_t run_for_milliseconds )
+{
+  clean_up_dropped_and_new_sockets();
 
   if ( poll( &m_poll_descriptors[0], m_poll_descriptors.size(), run_for_milliseconds ) < 0 )
   {
@@ -130,6 +143,7 @@ SocketPool::run_for( uint32_t run_for_milliseconds )
     {
       continue;
     }
+
     m_sockets[ poll_descriptor.fd ]->handle_event();
   }
 
