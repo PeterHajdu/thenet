@@ -12,22 +12,22 @@ namespace
   class ConnectionPoolChecker
   {
     public:
-      void on_new_connection( the::net::Connection& new_connection )
+      void on_new_connection( the::net::Connection::Pointer new_connection )
       {
         on_new_connection_was_called = true;
-        new_connections.push_back( &new_connection );
+        new_connections.push_back( new_connection );
       }
 
-      void on_connection_lost( the::net::Connection& lost_connection )
+      void on_connection_lost( the::net::Connection::Pointer lost_connection )
       {
         on_connection_lost_was_called = true;
-        lost_connections.push_back( &lost_connection );
+        lost_connections.push_back( lost_connection );
       }
 
       bool on_new_connection_was_called{ false };
       bool on_connection_lost_was_called{ false };
-      std::vector< the::net::Connection* > new_connections;
-      std::vector< the::net::Connection* > lost_connections;
+      std::vector< the::net::Connection::Pointer > new_connections;
+      std::vector< the::net::Connection::Pointer > lost_connections;
   };
 }
 
@@ -69,7 +69,7 @@ Describe( a_connection_pool )
   {
     add_new_sockets( 1 );
     AssertThat( checker->new_connections, HasLength( sockets.size() ) );
-    AssertThat( checker->new_connections[0], !Equals( checker->new_connections[1] ) )
+    AssertThat( checker->new_connections[0].get(), !Equals( checker->new_connections[1].get() ) )
   }
 
   It( calls_connection_lost_callback_if_a_socket_was_lost )
@@ -84,7 +84,7 @@ Describe( a_connection_pool )
     the::net::Socket& second_socket( *sockets[1] );
     connection_pool->on_socket_lost( second_socket );
 
-    the::net::Connection* second_connection( checker->new_connections[ 1 ] );
+    the::net::Connection::Pointer second_connection( checker->new_connections[ 1 ] );
     AssertThat( checker->lost_connections[0], Equals( second_connection ) );
   }
 
@@ -113,7 +113,7 @@ Describe( a_connection_pool )
   {
     add_new_sockets( 2 );
     the::net::Socket& second_socket( *sockets[1] );
-    the::net::Connection* second_connection( checker->new_connections[ 1 ] );
+    auto second_connection( checker->new_connections[ 1 ] );
 
     connection_pool->on_data_available( second_socket, test_message.network.data(), test_message.network.size() );
     AssertThat( has_test_message( *second_connection ), Equals( true ) );
@@ -132,7 +132,7 @@ Describe( a_connection_pool )
 
     for ( auto connection : checker->new_connections )
     {
-      AssertThat( connection_list, Contains( connection ) );
+      AssertThat( connection_list, Contains( connection.get() ) );
     }
   }
 

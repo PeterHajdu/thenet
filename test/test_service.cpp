@@ -89,7 +89,7 @@ Describe( a_service )
         });
 
     AssertThat( connections.empty(), Equals( false ) );
-    AssertThat( connections.back(), Equals( server->connections.back() ) );
+    AssertThat( connections.back(), Equals( server->connections.back().get() ) );
   }
 
   It( closes_tcp_connection_if_connection_is_dropped )

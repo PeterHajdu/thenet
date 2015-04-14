@@ -7,7 +7,7 @@ using namespace igloo;
 
 namespace
 {
-  void connection_event_callback( the::net::Connection& )
+  void connection_event_callback( the::net::Connection::Pointer )
   {
   }
 }

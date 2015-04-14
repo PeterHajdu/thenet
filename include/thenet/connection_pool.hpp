@@ -15,7 +15,7 @@ class Socket;
 class ConnectionPool
 {
   public:
-    typedef std::function<void( Connection& )> ConnectionEventCallback;
+    typedef std::function<void( Connection::Pointer )> ConnectionEventCallback;
     ConnectionPool(
         ConnectionEventCallback new_connection_callback,
         ConnectionEventCallback connection_lost_callback );

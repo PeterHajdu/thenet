@@ -20,15 +20,15 @@ ServiceChecker::ServiceChecker()
 
 
 void
-ServiceChecker::on_new_connection( the::net::Connection& connection )
+ServiceChecker::on_new_connection( the::net::Connection::Pointer connection )
 {
   new_connection_was_established = true;
-  connections.push_back( &connection );
+  connections.push_back( connection );
 }
 
 
 void
-ServiceChecker::on_connection_lost( the::net::Connection& connection )
+ServiceChecker::on_connection_lost( the::net::Connection::Pointer connection )
 {
   connection_was_lost = true;
 }

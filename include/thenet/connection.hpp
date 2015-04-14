@@ -16,7 +16,7 @@ class Socket;
 class Connection
 {
   public:
-    typedef std::unique_ptr< Connection > Pointer;
+    typedef std::shared_ptr< Connection > Pointer;
 
     Connection( Socket& );
     const int id;
